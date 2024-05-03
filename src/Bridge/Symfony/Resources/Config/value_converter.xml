@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<container
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://symfony.com/schema/dic/services"
+        xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd"
+>
+    <services>
+        <defaults
+                autowire="true"
+                autoconfigure="true"
+        />
+
+        <!-- Value Converter - Converts transformed value into object or array of objects -->
+        <service
+                id="ControlBit\Dto\Mapper\ValueConverter"
+                class="ControlBit\Dto\Mapper\ValueConverter"
+        >
+            <argument type="tagged_iterator" tag="dto_bundle.value_converter"/>
+        </service>
+
+        <service
+                id="ControlBit\Dto\Mapper\ValueConverter\ArrayOfDto"
+                class="ControlBit\Dto\Mapper\ValueConverter\ArrayOfDto"
+        >
+            <tag name="dto_bundle.value_converter" priority="100"/>
+        </service>
+
+        <service
+                id="ControlBit\Dto\Mapper\ValueConverter\ArrayToObject"
+                class="ControlBit\Dto\Mapper\ValueConverter\ArrayToObject"
+        >
+            <tag name="dto_bundle.value_converter" priority="80"/>
+        </service>
+    </services>
+</container>
