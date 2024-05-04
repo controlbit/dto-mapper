@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<container
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://symfony.com/schema/dic/services"
+        xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd"
+>
+    <services>
+        <defaults
+                autowire="true"
+                autoconfigure="true"
+        />
+
+        <!--        Property Metadata Factory-->
+        <service
+                id="ControlBit\Dto\MetaData\PropertyMetadataFactory"
+                class="ControlBit\Dto\MetaData\PropertyMetadataFactory"
+        >
+            <argument type="service" id="ControlBit\Dto\Finder\AccessorFinder"/>
+        </service>
+
+        <!--        Method Metadata Factory-->
+        <service
+                id="ControlBit\Dto\MetaData\MethodMetadataFactory"
+                class="ControlBit\Dto\MetaData\MethodMetadataFactory"
+        />
+
+        <!--        Object Metadata Factory-->
+        <service
+                id="ControlBit\Dto\MetaData\ObjectMetadataFactory"
+                class="ControlBit\Dto\MetaData\ObjectMetadataFactory"
+        >
+            <argument type="service" id="ControlBit\Dto\MetaData\PropertyMetadataFactory"/>
+            <argument type="service" id="ControlBit\Dto\MetaData\MethodMetadataFactory"/>
+        </service>
+
+    </services>
+</container>

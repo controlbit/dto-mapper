@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<container
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://symfony.com/schema/dic/services"
+        xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd"
+>
+    <services>
+        <defaults
+                autowire="true"
+                autoconfigure="true"
+        />
+
+        <!-- Accessor Finder - finds accessor for Object properties -->
+        <service
+                id="ControlBit\Dto\Finder\AccessorFinder"
+                class="ControlBit\Dto\Finder\AccessorFinder"
+        >
+        </service>
+
+        <!-- Setter Finder - Finds setter on destination object -->
+        <service
+                id="ControlBit\Dto\Finder\SetterFinder"
+                class="ControlBit\Dto\Finder\SetterFinder"
+        >
+            <argument type="tagged_iterator" tag="dto_bundle.setter_type"/>
+        </service>
+
+        <service
+                id="ControlBit\Dto\Finder\SetterType\MapTo"
+                class="ControlBit\Dto\Finder\SetterType\MapTo"
+        >
+            <tag name="dto_bundle.setter_type" priority="100"/>
+        </service>
+
+        <service
+                id="ControlBit\Dto\Finder\SetterType\ViaSetter"
+                class="ControlBit\Dto\Finder\SetterType\ViaSetter"
+        >
+            <tag name="dto_bundle.setter_type" priority="80"/>
+        </service>
+
+        <service
+                id="ControlBit\Dto\Finder\SetterType\Direct"
+                class="ControlBit\Dto\Finder\SetterType\Direct"
+        >
+            <tag name="dto_bundle.setter_type" priority="60"/>
+        </service>
+
+    </services>
+</container>
