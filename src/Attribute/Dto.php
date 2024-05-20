@@ -8,7 +8,7 @@ namespace ControlBit\Dto\Attribute;
  * Denotes when Given Object is DTO, on property, when mapping, or
  * with argument, on Controller injection, when using Symfony.
  */
-#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_PARAMETER | \Attribute::IS_REPEATABLE)]
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_PROPERTY | \Attribute::TARGET_PARAMETER | \Attribute::IS_REPEATABLE)]
 class Dto
 {
     /**
