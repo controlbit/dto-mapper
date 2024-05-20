@@ -321,7 +321,7 @@ You don't need it unless you want to override something.
 dto_bundle:
   # Throws JSON error message When DTO is invalid
   validation_json_bad_request: true
-
+  map_private_properties: true # Should map private properties
   # Currently ony one case transformer is available, but you can easily override with your own
   # This is purely by assumption on best practice, 
   # that you are using REST API Snake case, and PascalCase in your DTO object props.  

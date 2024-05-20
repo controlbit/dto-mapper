@@ -22,7 +22,7 @@
                 class="ControlBit\Dto\Bridge\Symfony\Event\ValidationExceptionListener"
         >
             <argument key="$throwJsonBadRequest">%dto_bundle.validation_json_bad_request%</argument>
-            <tag name="kernel.event_listener" priority="-1"/>
+            <tag name="kernel.event_listener" priority="1"/>
         </service>
 
     </services>

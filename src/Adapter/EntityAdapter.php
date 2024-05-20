@@ -6,6 +6,7 @@ namespace ControlBit\Dto\Adapter;
 use ControlBit\Dto\Attribute\Entity as EntityAttribute;
 use ControlBit\Dto\Attribute\Identifier;
 use ControlBit\Dto\Contract\Mapper\MapAdapterInterface;
+use ControlBit\Dto\Exception\EntityNotFoundException;
 use ControlBit\Dto\Exception\RuntimeException;
 use Doctrine\Persistence\ManagerRegistry;
 use function ControlBit\Dto\find_attribute;
@@ -37,6 +38,10 @@ final class EntityAdapter implements MapAdapterInterface
 
         if (null !== $identifier) {
             $existingEntity = $this->fetchEntity($identifier, $entityClass);
+            if (null === $existingEntity) {
+                throw new EntityNotFoundException($entityClass, $identifier);
+            }
+
         }
 
         $destination = $existingEntity ?? (new \ReflectionClass($entityClass))->newInstanceWithoutConstructor();

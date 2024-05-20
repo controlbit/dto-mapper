@@ -7,6 +7,7 @@ use ControlBit\Dto\Accessor\Accessor;
 use ControlBit\Dto\Accessor\Getter\MethodGetter;
 use ControlBit\Dto\Accessor\Getter\PropertyGetter;
 use ControlBit\Dto\Accessor\Setter\MethodSetter;
+use ControlBit\Dto\Accessor\Setter\PropertyReflectionSetter;
 use ControlBit\Dto\Accessor\Setter\PropertySetter;
 use ControlBit\Dto\Bag\AttributeBag;
 use ControlBit\Dto\Bag\TypeBag;
@@ -20,8 +21,12 @@ use function ControlBit\Dto\instantiate_attributes;
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  * TODO: Try to refactor in future.
  */
-final class AccessorFinder
+readonly final class AccessorFinder
 {
+    public function __construct(private bool $mapPrivateProperties)
+    {
+    }
+
     public function find(
         \ReflectionObject   $reflectionObject,
         \ReflectionProperty $reflectionProperty,
@@ -40,27 +45,34 @@ final class AccessorFinder
         \ReflectionClass    $reflectionClass,
         \ReflectionProperty $reflectionProperty,
     ): ?SetterInterface {
-        if ($reflectionProperty->isPublic()) {
-            return new PropertySetter(
-                $reflectionProperty->name,
-                new TypeBag(TypeTool::getReflectionTypes($reflectionProperty)),
-                AttributeBag::fromArray(instantiate_attributes($reflectionProperty)),
-            );
-        }
 
         $methodName = \sprintf('set%s', \ucfirst($reflectionProperty->name));
 
-        if (!$reflectionClass->hasMethod($methodName)) {
-            return null;
+        if ($reflectionClass->hasMethod($methodName)) {
+            $reflectionMethod = $reflectionClass->getMethod($methodName);
+
+            return new MethodSetter(
+                $methodName,
+                new TypeBag(TypeTool::getReflectionTypes($reflectionMethod)),
+                AttributeBag::fromArray(instantiate_attributes($reflectionMethod)),
+            );
         }
 
-        $reflectionMethod = $reflectionClass->getMethod($methodName);
+        $args = [
+            $reflectionProperty->name,
+            new TypeBag(TypeTool::getReflectionTypes($reflectionProperty)),
+            AttributeBag::fromArray(instantiate_attributes($reflectionProperty)),
+        ];
 
-        return new MethodSetter(
-            $methodName,
-            new TypeBag(TypeTool::getReflectionTypes($reflectionMethod)),
-            AttributeBag::fromArray(instantiate_attributes($reflectionMethod)),
-        );
+        if ($reflectionProperty->isPublic()) {
+            return new PropertySetter(...$args);
+        }
+
+        if ($this->mapPrivateProperties) {
+            return new PropertyReflectionSetter(...$args);
+        }
+
+        return null;
     }
 
     /**

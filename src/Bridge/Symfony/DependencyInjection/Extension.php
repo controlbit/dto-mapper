@@ -21,9 +21,9 @@ class Extension extends SymfonyExtension
         $config        = $this->processConfiguration($configuration, $configs);
 
         $container->setParameter('dto_bundle.validation_json_bad_request', $config['validation_json_bad_request']);
+        $container->setParameter('dto_bundle.map_private_properties', $config['map_private_properties']);
 
         $container->setAlias('dto_bundle.case_transformer', $config['case_transformer']);
-
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/Config'));
 
         $loader->load('case_transformer.xml');

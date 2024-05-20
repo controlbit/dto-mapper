@@ -26,13 +26,14 @@ use ControlBit\Dto\MetaData\PropertyMetadataFactory;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
  */
 final class Factory
 {
     /**
      * @param  class-string  $caseTransformer
      */
-    public static function create(string $caseTransformer = SnakeCaseToCamelCaseTransformer::class): Mapper
+    public static function create(bool $mapPrivateProperties = true, string $caseTransformer = SnakeCaseToCamelCaseTransformer::class): Mapper
     {
         if (!\class_exists($caseTransformer)) {
             throw new InvalidArgumentException(
@@ -42,7 +43,7 @@ final class Factory
 
         /** @var CaseTransformerInterface $caseTransformer */
         $caseTransformer         = new $caseTransformer();
-        $accessorFinder          = new AccessorFinder();
+        $accessorFinder          = new AccessorFinder($mapPrivateProperties);
         $propertyMetaDataFactory = new PropertyMetadataFactory($accessorFinder);
         $methodMetaDataFactory   = new MethodMetadataFactory();
         $objectMetadataFactory   = new ObjectMetadataFactory($propertyMetaDataFactory, $methodMetaDataFactory);

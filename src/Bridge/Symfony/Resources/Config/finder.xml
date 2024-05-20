@@ -15,6 +15,7 @@
                 id="ControlBit\Dto\Finder\AccessorFinder"
                 class="ControlBit\Dto\Finder\AccessorFinder"
         >
+            <argument key="$mapPrivateProperties">%dto_bundle.map_private_properties%</argument>
         </service>
 
         <!-- Setter Finder - Finds setter on destination object -->

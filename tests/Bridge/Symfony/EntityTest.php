@@ -54,16 +54,13 @@ class EntityTest extends SymfonyTestCase
     public function testEntityIsNew(): void
     {
         $source = new #[Entity(SampleEntity::class)] class() {
-            #[Identifier]
-            public string $id = "a99571f8-2b5a-4c0a-a7ce-fa1845c588c9"; // This should not be assigned nor found.
-
             public int $count = 30;
         };
 
         /** @var SampleEntity $mappedObject */
         $mappedObject = $this->mapper->map($source);
 
-        $this->assertFalse((new \ReflectionObject($mappedObject))->getProperty('id')->isInitialized($mappedObject));
+        $this->assertNull($mappedObject->getId());
         $this->assertEquals(30, $mappedObject->getCount());
 
         $this->entityManger->persist($mappedObject);

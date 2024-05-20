@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace ControlBit\Dto\Util;
 
+use ControlBit\Dto\Attribute\Identifier;
+use ControlBit\Dto\Attribute\Ignore;
 use ControlBit\Dto\MetaData\ObjectMetadata;
 use ControlBit\Dto\MetaData\PropertyMetadata;
 use Doctrine\Common\Collections\ArrayCollection;

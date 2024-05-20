@@ -26,7 +26,11 @@ final class Configuration implements ConfigurationInterface
                     ->scalarNode('case_transformer')
                         ->defaultValue(SnakeCaseToCamelCaseTransformer::class)
                         ->info('ID of service for transforming request key case, to camel case. From example, from Snake Case.')
-                ->end()
+                    ->end()
+                    ->booleanNode('map_private_properties')
+                        ->defaultValue(true)
+                        ->info('Should map private properties directly, using reflection.')
+                    ->end()
             ->end()
         ;
 

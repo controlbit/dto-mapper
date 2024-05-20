@@ -5,23 +5,16 @@ namespace ControlBit\Dto\Accessor\Setter;
 
 use ControlBit\Dto\Bag\AttributeBag;
 use ControlBit\Dto\Bag\TypeBag;
-use ControlBit\Dto\Contract\Accessor\SetterInterface;
 
 /**
- * Member setter by property name directly
+ * Member setter by property name directly, but using Reflection for private properties
  */
-readonly class PropertySetter implements SetterInterface
+final readonly class PropertyReflectionSetter extends PropertySetter
 {
-    public function __construct(
-        protected string       $propName,
-        protected TypeBag      $type,
-        protected AttributeBag $attributes,
-    ) {
-    }
-
     public function set(object $object, mixed $value): void
     {
-        $object->{$this->propName} = $value;
+        $reflection = new \ReflectionObject($object);
+        $reflection->getProperty($this->propName)->setValue($object, $value);
     }
 
     public function getType(): TypeBag
