@@ -1,5 +1,5 @@
 {
-    "name": "controlbit/dto",
+    "name": "controlbit/dto-mapper",
     "type": "library",
     "license": "CC-BY-4.0",
     "minimum-stability": "stable",
