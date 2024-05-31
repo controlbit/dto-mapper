@@ -3,26 +3,28 @@ declare(strict_types=1);
 
 namespace ControlBit\Dto;
 
-use ControlBit\Dto\Adapter\ArrayAdapter;
-use ControlBit\Dto\Adapter\CaseTransformer\SnakeCaseToCamelCaseTransformer;
-use ControlBit\Dto\Adapter\MapAdapter;
-use ControlBit\Dto\Adapter\ObjectAdapter;
-use ControlBit\Dto\Adapter\RequestAdapter;
-use ControlBit\Dto\Builder\Builder;
-use ControlBit\Dto\Contract\Mapper\CaseTransformerInterface;
-use ControlBit\Dto\Exception\InvalidArgumentException;
+use ControlBit\Dto\ConstructorStrategy\AlwaysStrategy;
+use ControlBit\Dto\ConstructorStrategy\NeverStrategy;
+use ControlBit\Dto\ConstructorStrategy\OptionalStrategy;
+use ControlBit\Dto\ConstructorStrategy\StrategyCollection;
+use ControlBit\Dto\Destination\ConstructedDelegate;
+use ControlBit\Dto\Destination\EntityDelegate;
+use ControlBit\Dto\Destination\NonConstructedDelegate;
+use ControlBit\Dto\Enum\ConstructorStrategy;
+use ControlBit\Dto\Destination\DestinationFactory;
 use ControlBit\Dto\Finder\AccessorFinder;
 use ControlBit\Dto\Finder\SetterFinder;
 use ControlBit\Dto\Finder\SetterType\Direct;
-use ControlBit\Dto\Finder\SetterType\MapTo;
 use ControlBit\Dto\Finder\SetterType\ViaSetter;
 use ControlBit\Dto\Mapper\Mapper;
 use ControlBit\Dto\Mapper\ValueConverter;
 use ControlBit\Dto\Mapper\ValueConverter\ArrayOfDto;
 use ControlBit\Dto\Mapper\ValueConverter\ArrayToObject;
-use ControlBit\Dto\MetaData\MethodMetadataFactory;
-use ControlBit\Dto\MetaData\ObjectMetadataFactory;
-use ControlBit\Dto\MetaData\PropertyMetadataFactory;
+use ControlBit\Dto\Mapper\ValueConverter\EntityIdentifier;
+use ControlBit\Dto\MetaData\Class\ClassMetadataFactory;
+use ControlBit\Dto\MetaData\Map\MapMetadataFactory;
+use ControlBit\Dto\MetaData\Method\MethodMetadataFactory;
+use ControlBit\Dto\MetaData\Property\PropertyMetadataFactory;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
@@ -30,33 +32,23 @@ use ControlBit\Dto\MetaData\PropertyMetadataFactory;
  */
 final class Factory
 {
-    /**
-     * @param  class-string  $caseTransformer
-     */
-    public static function create(bool $mapPrivateProperties = true, string $caseTransformer = SnakeCaseToCamelCaseTransformer::class): Mapper
+    private function __construct()
     {
-        if (!\class_exists($caseTransformer)) {
-            throw new InvalidArgumentException(
-                \sprintf('Transformer class "%s" does not exist.', $caseTransformer)
-            );
-        }
+        // noop
+    }
 
-        /** @var CaseTransformerInterface $caseTransformer */
-        $caseTransformer         = new $caseTransformer();
+    public static function create(
+        bool                $mapPrivateProperties = true,
+        ConstructorStrategy $constructorStrategy = ConstructorStrategy::OPTIONAL,
+    ): Mapper {
         $accessorFinder          = new AccessorFinder($mapPrivateProperties);
         $propertyMetaDataFactory = new PropertyMetadataFactory($accessorFinder);
         $methodMetaDataFactory   = new MethodMetadataFactory();
-        $objectMetadataFactory   = new ObjectMetadataFactory($propertyMetaDataFactory, $methodMetaDataFactory);
-        $mapAdapter              = new MapAdapter(
+        $mapMetadataFactory      = new MapMetadataFactory();
+        $objectMetadataFactory   = new ClassMetadataFactory($propertyMetaDataFactory, $methodMetaDataFactory);
+
+        $setterFinder = new SetterFinder(
             [
-                new RequestAdapter($caseTransformer),
-                new ObjectAdapter(),
-                new ArrayAdapter(),
-            ]
-        );
-        $setterFinder            = new SetterFinder(
-            [
-                new  MapTo(),
                 new  ViaSetter(),
                 new  Direct(),
             ],
@@ -66,11 +58,36 @@ final class Factory
             [
                 new ArrayOfDto(),
                 new ArrayToObject(),
+                new EntityIdentifier(),
             ]
         );
 
-        $builder = new Builder($valueConverter);
+        $alwaysStrategy = new AlwaysStrategy($valueConverter);
+        $neverStrategy  = new NeverStrategy($mapPrivateProperties);
 
-        return new Mapper($objectMetadataFactory, $mapAdapter, $setterFinder, $builder);
+        $strategyCollection = new StrategyCollection(
+            [
+                $alwaysStrategy,
+                $neverStrategy,
+                new OptionalStrategy($alwaysStrategy, $neverStrategy, $mapPrivateProperties),
+            ],
+            $constructorStrategy
+        );
+
+        $destinationFactory = new DestinationFactory(
+            [
+                new EntityDelegate(),
+                new ConstructedDelegate($strategyCollection),
+                new NonConstructedDelegate(),
+            ]
+        );
+
+        return new Mapper(
+            $objectMetadataFactory,
+            $mapMetadataFactory,
+            $destinationFactory,
+            $valueConverter,
+            $setterFinder
+        );
     }
 }

@@ -3,7 +3,7 @@
 # USER VARIABLES / PROJECT VARIABLES
 PHP_CONTAINER_NAME = php
 
-DOCKER_COMPOSE = docker-compose
+DOCKER_COMPOSE = docker compose
 DOCKER_COMPOSE_UP =  ${DOCKER_COMPOSE} up -d --force-recreate --remove-orphans
 DOCKER_COMPOSE_BUILD = ${DOCKER_COMPOSE} build --no-cache
 DOCKER_COMPOSE_DOWN =  ${DOCKER_COMPOSE} down
