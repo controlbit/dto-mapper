@@ -28,8 +28,9 @@ final class ValidationExceptionListener
 
         $request     = $event->getRequest();
         $contentType = $request->headers->get('content-type');
+        $format      = $request->attributes->get('_route_params')['_format'] ?? null;
 
-        if (\strtolower((string)$contentType) !== 'application/json') {
+        if ($format !== 'json' && \strtolower((string)$contentType) !== 'application/json') {
             return;
         }
 
