@@ -11,7 +11,7 @@ final class AppFixtures extends Fixture
 {
     public static string $ID;
 
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $entity = new SampleEntity('018f3f21-f0da-7084-982e-848b18bfecd1');
         $manager->persist($entity);

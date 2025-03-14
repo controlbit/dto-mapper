@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<container
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://symfony.com/schema/dic/services"
+        xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd"
+>
+    <services>
+        <defaults
+                autowire="true"
+                autoconfigure="true"
+        >
+            <bind key="$mapPrivateProperties">%dto_bundle.map_private_properties%</bind>
+        </defaults>
+
+        <prototype
+                namespace="ControlBit\Dto\ConstructorStrategy\"
+                resource="../../../../../src/ConstructorStrategy/*Strategy.php"
+        >
+            <tag name="dto_bundle.constructor_strategy"/>
+        </prototype>
+
+        <!--        Strategy Collection-->
+        <service
+                id="ControlBit\Dto\ConstructorStrategy\StrategyCollection"
+                class="ControlBit\Dto\ConstructorStrategy\StrategyCollection"
+        >
+            <argument type="tagged_iterator" tag="dto_bundle.constructor_strategy"/>
+            <argument>%dto_bundle.constructor_strategy%</argument>
+        </service>
+
+    </services>
+</container>
