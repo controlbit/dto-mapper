@@ -11,7 +11,7 @@ interface TransformerInterface
     public function transform(mixed $value): mixed;
 
     /**
-     * Used when transforming from DOCTRINE-ENTITY to DTO
+     * Used when transforming from DOCTRINE-ENTITY/Array/Request to DTO
      */
     public function reverse(mixed $value): mixed;
 }
