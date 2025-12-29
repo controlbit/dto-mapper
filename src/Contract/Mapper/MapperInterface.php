@@ -9,4 +9,12 @@ interface MapperInterface
      * @param  object|array<mixed>  $source
      */
     public function map(object|array $source, ?string $destination = null): object;
+
+    /**
+     * @param  array<mixed>  $source
+     * @param  class-string  $destination
+     *
+     * @return array<mixed>
+     */
+    public function mapCollection(array $source, string $destination = null): array;
 }

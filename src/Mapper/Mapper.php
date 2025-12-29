@@ -25,6 +25,11 @@ final readonly class Mapper implements MapperInterface
     ) {
     }
 
+    public function mapCollection(array $source, string $destination = null): array
+    {
+        return \array_map(fn($item) => $this->map($item, $destination), $source);
+    }
+
     public function map(object|array $source, string|object|null $destination = null): object
     {
         // Preparing source object. It must be objected.
