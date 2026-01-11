@@ -6,7 +6,7 @@ namespace ControlBit\Dto\Contract\Transformer;
 interface TransformableInterface
 {
     /**
-     * @return class-string|string|null
+     * @return string|null
      */
     public function getTransformerClassOrId(): ?string;
 

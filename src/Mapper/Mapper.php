@@ -3,15 +3,17 @@ declare(strict_types=1);
 
 namespace ControlBit\Dto\Mapper;
 
+use ControlBit\Dto\Attribute\Dto;
 use ControlBit\Dto\Contract\Mapper\MapperInterface;
+use ControlBit\Dto\Exception\InvalidArgumentException;
 use ControlBit\Dto\Exception\PropertyMapException;
 use ControlBit\Dto\Destination\DestinationFactory;
+use ControlBit\Dto\Finder\AccessorFinder;
 use ControlBit\Dto\Finder\SetterFinder;
 use ControlBit\Dto\MetaData\Class\ClassMetadata;
 use ControlBit\Dto\MetaData\Class\ClassMetadataFactory;
 use ControlBit\Dto\MetaData\Map\MapMetadataCollection;
 use ControlBit\Dto\MetaData\Map\MapMetadataFactory;
-use ControlBit\Dto\MetaData\Property\PropertyMetadata;
 use ControlBit\Dto\Util\Initializer;
 
 final readonly class Mapper implements MapperInterface
@@ -22,6 +24,7 @@ final readonly class Mapper implements MapperInterface
         private DestinationFactory   $destinationFactory,
         private ValueConverter       $valueConverter,
         private SetterFinder         $setterFinder,
+        private AccessorFinder       $accessorFinder,
     ) {
     }
 
@@ -32,7 +35,7 @@ final readonly class Mapper implements MapperInterface
 
     public function map(object|array $source, string|object|null $destination = null): object
     {
-        // Preparing source object. It must be objected.
+        // Preparing source object. It must be objected to.
         $source = \is_object($source) ? $source : (object)$source;
 
         \assert(\is_object($source));
@@ -40,11 +43,19 @@ final readonly class Mapper implements MapperInterface
         // Fetching source metadata. This could be cached. But not in case of stdClass.
         $sourceMetadata = $this->objectMetadataFactory->create($source);
 
-        // Auto initialize values that are not initialized in source object.
-        Initializer::autoInitialize($source, $sourceMetadata);
+        if (null === $destination) {
+            $destination = $sourceMetadata->getAttributes()->get(Dto::class)?->getEntityClass();
 
-        // Getting metadata for mapping
-        $mapMetadata = $this->mapMetadataFactory->create($sourceMetadata);
+            if (null === $destination) {
+                throw new InvalidArgumentException('Unknown Destination class/object. At least add #[Dto] on Source class.');
+            }
+        }
+
+        $destinationMetadata = $this->objectMetadataFactory->create($destination);
+        $mapMetadata         = $this->mapMetadataFactory->create($sourceMetadata, $destinationMetadata);
+
+        // Auto-initialize values that are not initialized in a source object.
+        Initializer::autoInitialize($source, $sourceMetadata);
 
         if (!\is_object($destination)) {
             $destination = $this->destinationFactory->create(
@@ -56,14 +67,12 @@ final readonly class Mapper implements MapperInterface
             );
         }
 
-        // Fetching source metadata. This could be cached. But not in case of stdClass.
-        $destinationMetadata = $this->objectMetadataFactory->create($destination);
-        $destination         = $this->execute(
+        $destination = $this->execute(
             $source,
             $destination,
             $sourceMetadata,
             $destinationMetadata,
-            $mapMetadata
+            $mapMetadata,
         );
 
         Initializer::autoInitialize($destination, $destinationMetadata);
@@ -79,7 +88,7 @@ final readonly class Mapper implements MapperInterface
         MapMetadataCollection $mapMetadataCollection,
     ): object {
         foreach ($mapMetadataCollection as $mapMetadata) {
-            if (!$mapMetadata->getDestinationMember() || $mapMetadata->isMappedInConstructor()) {
+            if ($mapMetadata->isMappedInConstructor()) {
                 continue;
             }
 
@@ -89,15 +98,20 @@ final readonly class Mapper implements MapperInterface
                 continue;
             }
 
-            /** @var PropertyMetadata $propertyMetadata */
-            $propertyMetadata = $sourceMetadata->getProperty($mapMetadata->getSourceMember());
-            $value            = $propertyMetadata->getAccessor()->get($source);
-            $value            = $this->valueConverter->map($this, $sourceMetadata, $setter, $mapMetadata, $value);
+            $sourceReflection = new \ReflectionObject($source);
+            $getter = $this->accessorFinder->findGetter($sourceReflection, $mapMetadata);
+
+            if (null === $getter) {
+                continue;
+            }
+
+            $value = $getter->get($source);
+            $value = $this->valueConverter->map($this, $sourceMetadata, $getter, $setter, $value);
 
             try {
                 $setter->set($destination, $value);
             } catch (\Throwable $e) {
-                throw new PropertyMapException($propertyMetadata, $sourceMetadata, $destinationMetadata, $setter, $e);
+                throw new PropertyMapException($mapMetadata, $sourceMetadata, $destinationMetadata, $setter, $getter, $e);
             }
         }
 

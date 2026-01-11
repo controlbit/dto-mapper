@@ -14,18 +14,18 @@ interface ConstructorStrategyInterface
      */
     public function validate(
         \ReflectionClass      $destinationReflectionClass,
-        MapMetadataCollection $sourceMapMetadataCollection,
+        MapMetadataCollection $mapMetadata,
     ): void;
 
     /**
-     * @param  \ReflectionClass<object>  $reflectionClass
+     * @param  \ReflectionClass<object>  $destinationReflectionClass
      */
     public function create(
         Mapper                $mapper,
         object                $source,
         ClassMetadata         $sourceMetadata,
-        MapMetadataCollection $sourceMapMetadataCollection,
-        \ReflectionClass      $reflectionClass,
+        MapMetadataCollection $mapMetadata,
+        \ReflectionClass      $destinationReflectionClass,
     ): object;
 
     public function getName(): string;

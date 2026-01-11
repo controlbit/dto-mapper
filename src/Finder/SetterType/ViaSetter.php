@@ -9,19 +9,22 @@ use ControlBit\Dto\Bag\TypeBag;
 use ControlBit\Dto\Contract\Accessor\SetterInterface;
 use ControlBit\Dto\Contract\Mapper\SetterResolverInterface;
 use ControlBit\Dto\MetaData\Class\ClassMetadata;
-use ControlBit\Dto\MetaData\Map\MemberMapMetadata;
+use ControlBit\Dto\MetaData\Map\MapMetadata;
 use ControlBit\Dto\Util\TypeTool;
 use function ControlBit\Dto\instantiate_attributes;
 
 final class ViaSetter implements SetterResolverInterface
 {
     public function resolve(
-        ClassMetadata     $destinationMetaData,
-        MemberMapMetadata $memberMapMetadata,
+        ClassMetadata $destinationMetaData,
+        MapMetadata   $mapMetadata,
     ): ?SetterInterface {
 
-        $method = $destinationMetaData->getMethod($memberMapMetadata->getDestinationMember())
-                  ?? $destinationMetaData->getMethod('set'.\ucfirst($memberMapMetadata->getDestinationMember()));
+        $method = match (true) {
+            $mapMetadata->getDestinationMethod() !== null => $destinationMetaData->getMethod($mapMetadata->getDestinationMethod()),
+            $mapMetadata->getDestinationMember() !== null => $destinationMetaData->getMethod('set'.\ucfirst($mapMetadata->getDestinationMember())),
+            default                                       => null,
+        };
 
         if (null === $method) {
             return null;

@@ -2,7 +2,7 @@
 
 namespace ControlBit\Dto\Tests\Mapper\ViaSetter;
 
-use ControlBit\Dto\Attribute\MapTo;
+use ControlBit\Dto\Attribute\To;
 use ControlBit\Dto\Exception\PropertyMapException;
 use ControlBit\Dto\Tests\LibraryTestCase;
 
@@ -11,7 +11,7 @@ class TypelessTest extends LibraryTestCase
     public function testViaSetter(): void
     {
         $from = new class() {
-            #[MapTo('setBar')]
+            #[To(setter: 'setBar')]
             public $foo = 'foo';
         };
 
@@ -37,7 +37,7 @@ class TypelessTest extends LibraryTestCase
     public function testSetterMethodDoesNotExistsLeavesUnmapped(): void
     {
         $from = new class() {
-            #[MapTo('setFoo')]
+            #[To(setter: 'setFoo')]
             public $foo = 'foo';
         };
 
@@ -62,7 +62,7 @@ class TypelessTest extends LibraryTestCase
     public function testSetterNonPublicMethodThrowsException(): void
     {
         $from = new class() {
-            #[MapTo('setBar')]
+            #[To(setter: 'setBar')]
             public $foo = 'foo';
         };
 

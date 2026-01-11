@@ -3,13 +3,13 @@ declare(strict_types=1);
 
 namespace ControlBit\Dto\Mapper;
 
+use ControlBit\Dto\Contract\Accessor\GetterInterface;
 use ControlBit\Dto\Contract\Accessor\SetterInterface;
 use ControlBit\Dto\Contract\Mapper\ValueConverterInterface;
 use ControlBit\Dto\Contract\Transformer\TransformableInterface;
 use ControlBit\Dto\Contract\Transformer\TransformerInterface;
 use ControlBit\Dto\Exception\InvalidArgumentException;
 use ControlBit\Dto\MetaData\Class\ClassMetadata;
-use ControlBit\Dto\MetaData\Map\MemberMapMetadata;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 final readonly class ValueConverter
@@ -26,11 +26,13 @@ final readonly class ValueConverter
     public function map(
         Mapper            $mapper,
         ClassMetadata     $sourceMetadata,
+        GetterInterface   $getter,
         SetterInterface   $setter,
-        MemberMapMetadata $memberMapMetadata,
         mixed             $value,
     ): mixed {
-        $value = $this->transform($value, $sourceMetadata, $memberMapMetadata);
+        if ($getter instanceof TransformableInterface) {
+            $value = $this->transform($value, $sourceMetadata, $getter);
+        }
 
         foreach ($this->valueConverters as $valueConverter) {
             if (!$valueConverter->supports($setter, $value)) {

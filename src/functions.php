@@ -38,7 +38,7 @@ function find_attribute(mixed $subject, string $attributeClass): ?object
  * @return object[]
  */
 function instantiate_attributes(
-    \ReflectionProperty|\ReflectionMethod|\ReflectionObject|\ReflectionParameter $reflection,
+    \ReflectionProperty|\ReflectionMethod|\ReflectionObject|\ReflectionClass|\ReflectionParameter $reflection,
 ): array {
     return \array_map(static function (\ReflectionAttribute $reflectionAttribute) {
         return $reflectionAttribute->newInstance();

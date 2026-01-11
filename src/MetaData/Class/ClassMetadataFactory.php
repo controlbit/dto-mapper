@@ -18,23 +18,23 @@ final readonly class ClassMetadataFactory
     ) {
     }
 
-    public function create(object $object): ClassMetadata
+    public function create(object|string $subject): ClassMetadata
     {
-        $reflectionObject = new \ReflectionObject($object);
+        $reflection = is_object($subject) ? new \ReflectionObject($subject) : new \ReflectionClass($subject);
 
         $properties = new PropertyBag();
-        foreach ($reflectionObject->getProperties() as $reflectionProperty) {
-            $properties->add($this->propertyMetadataFactory->create($object, $reflectionProperty->getName()));
+        foreach ($reflection->getProperties() as $reflectionProperty) {
+            $properties->add($this->propertyMetadataFactory->create($subject, $reflectionProperty->getName()));
         }
 
         $methods = new MethodBag();
-        foreach ($reflectionObject->getMethods() as $reflectionMethod) {
-            $methods->add($this->methodMetadataFactory->create($object, $reflectionMethod->getName()));
+        foreach ($reflection->getMethods() as $reflectionMethod) {
+            $methods->add($this->methodMetadataFactory->create($reflection, $reflectionMethod->getName()));
         }
 
         return new ClassMetadata(
-            \get_class($object),
-            AttributeBag::fromArray(instantiate_attributes($reflectionObject)),
+            $reflection->getName(),
+            AttributeBag::fromArray(instantiate_attributes($reflection)),
             $properties,
             $methods
         );

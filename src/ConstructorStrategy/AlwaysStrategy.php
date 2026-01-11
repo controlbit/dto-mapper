@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace ControlBit\Dto\ConstructorStrategy;
 
 use ControlBit\Dto\Accessor\Setter\ConstructorSetter;
+use ControlBit\Dto\Attribute\From;
 use ControlBit\Dto\Bag\AttributeBag;
 use ControlBit\Dto\Bag\TypeBag;
 use ControlBit\Dto\Contract\Accessor\GetterInterface;
@@ -11,11 +12,14 @@ use ControlBit\Dto\Contract\ConstructorStrategyInterface;
 use ControlBit\Dto\Exception\InvalidArgumentException;
 use ControlBit\Dto\Exception\MissingArgumentException;
 use ControlBit\Dto\Exception\MissingConstructorException;
+use ControlBit\Dto\Finder\AccessorFinder;
 use ControlBit\Dto\Mapper\Mapper;
 use ControlBit\Dto\Mapper\ValueConverter;
 use ControlBit\Dto\MetaData\Class\ClassMetadata;
 use ControlBit\Dto\MetaData\Map\MapMetadataCollection;
+use ControlBit\Dto\MetaData\Map\MapMetadata;
 use ControlBit\Dto\Util\TypeTool;
+use function ControlBit\Dto\find_attribute;
 use function ControlBit\Dto\instantiate_attributes;
 
 /**
@@ -26,13 +30,14 @@ final readonly class AlwaysStrategy implements ConstructorStrategyInterface
 {
     public const NAME = 'always';
 
-    public function __construct(private ValueConverter $valueConverter)
-    {
+    public function __construct(
+        private ValueConverter $valueConverter,
+    ) {
     }
 
     public function validate(
-        \ReflectionClass $destinationReflectionClass,
-        MapMetadataCollection $sourceMapMetadataCollection,
+        \ReflectionClass      $destinationReflectionClass,
+        MapMetadataCollection $mapMetadata,
     ): void {
         $constructor = $destinationReflectionClass->getConstructor();
 
@@ -44,7 +49,7 @@ final readonly class AlwaysStrategy implements ConstructorStrategyInterface
             );
         }
 
-        if ($constructor->getNumberOfRequiredParameters() > \count($sourceMapMetadataCollection)) {
+        if ($constructor->getNumberOfRequiredParameters() > \count($mapMetadata)) {
             throw new InvalidArgumentException(
                 \sprintf(
                     "Not enough members to map as arguments in constructor (Strategy \"%s\".).", $this->getName()
@@ -60,14 +65,14 @@ final readonly class AlwaysStrategy implements ConstructorStrategyInterface
         Mapper                $mapper,
         object                $source,
         ClassMetadata         $sourceMetadata,
-        MapMetadataCollection $sourceMapMetadataCollection,
-        \ReflectionClass      $reflectionClass,
+        MapMetadataCollection $mapMetadata,
+        \ReflectionClass      $destinationReflectionClass,
     ): object {
-        $constructor = $reflectionClass->getConstructor();
+        $constructor = $destinationReflectionClass->getConstructor();
 
         if (null === $constructor) {
             throw new MissingConstructorException(
-                \sprintf('Class "%s" is missing constructor.', $reflectionClass->getName())
+                \sprintf('Class "%s" is missing constructor.', $destinationReflectionClass->getName())
             );
         }
 
@@ -75,18 +80,19 @@ final readonly class AlwaysStrategy implements ConstructorStrategyInterface
         $argumentsToPass    = [];
 
         foreach ($availableArguments as $argument) {
-            $sourceMemberMetadata = $sourceMapMetadataCollection->getHavingDestinationMember($argument->getName());
+            /** @var MapMetadata $destinationMemberMetaData */
+            $destinationMemberMetaData = $mapMetadata->getHavingDestinationMember($argument->getName());
+            $destinationMemberMetaData->setMappedInConstructor();
+            $sourcePropertyMetadata = $sourceMetadata->getProperty($destinationMemberMetaData->getSourceMember());
 
-            if (null === $sourceMemberMetadata) {
-                $argumentsToPass[] = $this->getArgumentValue(null, $argument);
+            // TODO: Handle From and To
+            if (null === $sourcePropertyMetadata) {
+                $argumentsToPass[] = $this->getArgumentValue($argument);
                 continue;
             }
 
-            $sourceMemberMetadata->setMappedInConstructor();
-            $propertyMetadata = $sourceMetadata->getProperty($sourceMemberMetadata->getSourceMember());
-
             /** @var GetterInterface $getter */
-            $getter = $propertyMetadata?->getAccessor()->getGetter();
+            $getter = $sourcePropertyMetadata?->getAccessor()->getGetter();
             $setter = new ConstructorSetter(
                 new TypeBag(TypeTool::getReflectionTypes($argument)),
                 AttributeBag::fromArray(instantiate_attributes($argument)),
@@ -95,18 +101,18 @@ final readonly class AlwaysStrategy implements ConstructorStrategyInterface
             $value = $this->valueConverter->map(
                 $mapper,
                 $sourceMetadata,
+                $getter,
                 $setter,
-                $sourceMemberMetadata,
                 $getter->get($source),
             );
 
-            $argumentsToPass[] = $this->getArgumentValue($value, $argument);
+            $argumentsToPass[] = $this->getArgumentValue($argument, $value);
         }
 
-        return $reflectionClass->newInstanceArgs($argumentsToPass);
+        return $destinationReflectionClass->newInstanceArgs($argumentsToPass);
     }
 
-    private function getArgumentValue(mixed $value, \ReflectionParameter $argument): mixed
+    private function getArgumentValue(\ReflectionParameter $argument, mixed $value = null): mixed
     {
         if ($value !== null) {
             return $value;
@@ -117,7 +123,13 @@ final readonly class AlwaysStrategy implements ConstructorStrategyInterface
         }
 
         if (!$argument->isDefaultValueAvailable()) {
-            throw new MissingArgumentException('Tried to put value via Constructor.');
+            throw new MissingArgumentException(
+                \sprintf(
+                    'Tried to put value for argument "%s" via Constructor in class "%s", but no value was provided and no default value is available.',
+                    $argument->getName(),
+                    $argument->getDeclaringClass()?->getName()
+                )
+            );
         }
 
         return $argument->getDefaultValue();

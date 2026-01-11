@@ -15,9 +15,9 @@ final readonly class PropertyMetadataFactory
     {
     }
 
-    public function create(object $object, string $propertyName): PropertyMetadata
+    public function create(object|string $subject, string $propertyName): PropertyMetadata
     {
-        $reflectionObject   = new \ReflectionObject($object);
+        $reflectionObject   = \is_object($subject) ? new \ReflectionObject($subject) : new \ReflectionClass($subject);
         $reflectionProperty = $reflectionObject->getProperty($propertyName);
         $type               = $this->getType($reflectionProperty);
 

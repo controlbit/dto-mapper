@@ -5,12 +5,14 @@ namespace ControlBit\Dto\MetaData\Property;
 
 use ControlBit\Dto\Attribute\Identifier;
 use ControlBit\Dto\Attribute\Ignore;
+use ControlBit\Dto\Attribute\Transformer;
 use ControlBit\Dto\Bag\AttributeBag;
 use ControlBit\Dto\Bag\TypeBag;
 use ControlBit\Dto\Contract\Accessor\AccessorInterface;
 use ControlBit\Dto\Contract\AttributedInterface;
+use ControlBit\Dto\Contract\Transformer\TransformableInterface;
 
-final class PropertyMetadata implements AttributedInterface
+final class PropertyMetadata implements AttributedInterface, TransformableInterface
 {
     public function __construct(
         private readonly string            $name,
@@ -36,13 +38,6 @@ final class PropertyMetadata implements AttributedInterface
         return $this->accessor;
     }
 
-    public function shouldIgnore(): bool
-    {
-        return
-            $this->getAttributes()->has(Ignore::class) ||
-            $this->getAttributes()->has(Identifier::class);
-    }
-
     public function getAttributes(): AttributeBag
     {
         return $this->attributes;
@@ -51,5 +46,18 @@ final class PropertyMetadata implements AttributedInterface
     public function isPublic(): bool
     {
         return $this->isPublic;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getTransformerClassOrId(): ?string
+    {
+        return $this->attributes->get(Transformer::class)?->getTransformerIdOrClass();
+    }
+
+    public function hasTransformer(): bool
+    {
+        return $this->attributes->has(Transformer::class);
     }
 }

@@ -22,7 +22,7 @@ final readonly class ConstructedDelegate implements DestinationFactoryInterface
         Mapper                $mapper,
         object                $source,
         ClassMetadata         $sourceClassMetadata,
-        MapMetadataCollection $sourceMapMetadataCollection,
+        MapMetadataCollection $mapMetadataCollection,
         ?string               $destination,
     ): object|string|null {
         if (null === $destination || !\class_exists($destination)) {
@@ -34,13 +34,13 @@ final readonly class ConstructedDelegate implements DestinationFactoryInterface
         $destinationReflection = new \ReflectionClass($destination);
         $constructorStrategy   = $this->getConstructorStrategy($dtoAttribute);
 
-        $constructorStrategy->validate($destinationReflection, $sourceMapMetadataCollection);
+        $constructorStrategy->validate($destinationReflection, $mapMetadataCollection);
 
         return $constructorStrategy->create(
             $mapper,
             $source,
             $sourceClassMetadata,
-            $sourceMapMetadataCollection,
+            $mapMetadataCollection,
             $destinationReflection,
         );
     }

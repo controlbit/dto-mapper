@@ -14,7 +14,7 @@ use ControlBit\Dto\MetaData\Property\PropertyMetadata;
  * Source Property metadata and destination object metadata
  * by calling dedicated setter resolvers in order to get one.
  */
-final readonly class SetterFinder
+final readonly class GetterFinder
 {
     /**
      * @param  iterable<SetterResolverInterface>  $resolvers
@@ -23,10 +23,10 @@ final readonly class SetterFinder
     {
     }
 
-    public function find(ClassMetadata $destinationMetadata, MapMetadata $memberMapMetadata): ?SetterInterface
+    public function find(ClassMetadata $classMetadata, MapMetadata $memberMapMetadata): ?SetterInterface
     {
         foreach ($this->resolvers as $resolver) {
-            $setter = $resolver->resolve($destinationMetadata, $memberMapMetadata);
+            $setter = $resolver->resolve($classMetadata, $memberMapMetadata);
 
             if (null === $setter) {
                 continue;
@@ -35,7 +35,6 @@ final readonly class SetterFinder
             return $setter;
         }
 
-        // TODO: Log
         return null;
     }
 }

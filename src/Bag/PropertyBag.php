@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace ControlBit\Dto\Bag;
 
+use ControlBit\Dto\Attribute\To;
 use ControlBit\Dto\MetaData\Property\PropertyMetadata;
 
 /**
@@ -38,6 +39,10 @@ final class PropertyBag implements \IteratorAggregate
         foreach ($this->properties as $propertyMetaData) {
             if ($propertyMetaData->getName() === $propertyName) {
                 return $propertyMetaData;
+            }
+
+            if ($propertyMetaData->getAttributes()->get(To::class)?->getMember() === $propertyName) {
+                return  $propertyMetaData;
             }
         }
 

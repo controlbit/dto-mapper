@@ -87,7 +87,8 @@ final class Factory
             $mapMetadataFactory,
             $destinationFactory,
             $valueConverter,
-            $setterFinder
+            $setterFinder,
+            $accessorFinder,
         );
     }
 }

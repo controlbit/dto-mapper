@@ -21,7 +21,7 @@ final readonly class EntityDelegate implements DestinationFactoryInterface
         Mapper                $mapper,
         object                $source,
         ClassMetadata         $sourceClassMetadata,
-        MapMetadataCollection $sourceMapMetadataCollection,
+        MapMetadataCollection $mapMetadataCollection,
         ?string               $destination,
     ): object|string|null {
         /** @var ?Dto $dtoAttribute */

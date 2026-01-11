@@ -6,6 +6,7 @@ namespace ControlBit\Dto\Tests\Mapper;
 use ControlBit\Dto\Attribute\Dto;
 use ControlBit\Dto\Enum\ConstructorStrategy;
 use ControlBit\Dto\Exception\InvalidArgumentException;
+use ControlBit\Dto\Exception\MissingArgumentException;
 use ControlBit\Dto\Factory;
 use ControlBit\Dto\Tests\LibraryTestCase;
 use ControlBit\Dto\Tests\Resources\DtoWithConstructor;
@@ -71,7 +72,7 @@ class ConstructorTest extends LibraryTestCase
     {
         $from = new class() {};
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(MissingArgumentException::class);
 
         Factory::create(true, ConstructorStrategy::ALWAYS)->map($from, DtoWithConstructor::class);
     }

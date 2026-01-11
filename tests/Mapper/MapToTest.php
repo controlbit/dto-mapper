@@ -2,7 +2,7 @@
 
 namespace ControlBit\Dto\Tests\Mapper;
 
-use ControlBit\Dto\Attribute\MapTo;
+use ControlBit\Dto\Attribute\To;
 use ControlBit\Dto\Tests\LibraryTestCase;
 
 class MapToTest extends LibraryTestCase
@@ -10,7 +10,7 @@ class MapToTest extends LibraryTestCase
     public function testBasicPropertyMappingFromObjectToDifferentProperty(): void
     {
         $from = new class() {
-            #[MapTo('bar')]
+            #[To('bar')]
             public $foo = 'foo';
         };
 

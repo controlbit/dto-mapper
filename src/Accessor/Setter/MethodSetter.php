@@ -8,7 +8,7 @@ use ControlBit\Dto\Bag\TypeBag;
 use ControlBit\Dto\Contract\Accessor\SetterInterface;
 
 /**
- * Member Setter that change member by method
+ * Member Setter that changes member by method
  */
 final readonly class MethodSetter implements SetterInterface
 {

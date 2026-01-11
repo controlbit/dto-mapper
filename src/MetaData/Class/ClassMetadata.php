@@ -34,7 +34,7 @@ final readonly class ClassMetadata implements AttributedInterface
 
     public function getProperty(string $propertyName): ?PropertyMetadata
     {
-        return $this->properties->get($propertyName);
+        return$this->properties->get($propertyName);
     }
 
     public function getMethod(string $methodName): ?MethodMetadata

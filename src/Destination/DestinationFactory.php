@@ -23,7 +23,7 @@ final readonly class DestinationFactory
         Mapper                $mapper,
         object                $source,
         ClassMetadata         $sourceClassMetadata,
-        MapMetadataCollection $sourceMapMetadataCollection,
+        MapMetadataCollection $mapMetadataCollection,
         ?string               $destination,
     ): object {
         foreach ($this->delegates as $delegate) {
@@ -31,7 +31,7 @@ final readonly class DestinationFactory
                 $mapper,
                 $source,
                 $sourceClassMetadata,
-                $sourceMapMetadataCollection,
+                $mapMetadataCollection,
                 $destination,
             );
 

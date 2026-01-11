@@ -215,10 +215,10 @@ In that case we can use `ControlBit\Dto\Attribute\MapTo` attribute on source pro
 
 ```php
 
-use ControlBit\Dto\Attribute\MapTo;
+use ControlBit\Dto\Attribute\To;
 
 class OrderDto {
-    #[MapTo('priceWithoutVat')]
+    #[To('priceWithoutVat')]
     private float $price;
 }
 

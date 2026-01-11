@@ -19,7 +19,7 @@ final class NeverStrategy implements ConstructorStrategyInterface
 
     public function validate(
         \ReflectionClass      $destinationReflectionClass,
-        MapMetadataCollection $sourceMapMetadataCollection,
+        MapMetadataCollection $mapMetadata,
     ): void {
 
         if ($this->mapPrivateProperties) {
@@ -39,10 +39,10 @@ final class NeverStrategy implements ConstructorStrategyInterface
         Mapper                $mapper,
         object                $source,
         ClassMetadata         $sourceMetadata,
-        MapMetadataCollection $sourceMapMetadataCollection,
-        \ReflectionClass      $reflectionClass,
+        MapMetadataCollection $mapMetadata,
+        \ReflectionClass      $destinationReflectionClass,
     ): object {
-        return $reflectionClass->newInstanceWithoutConstructor();
+        return $destinationReflectionClass->newInstanceWithoutConstructor();
     }
 
     public function getName(): string

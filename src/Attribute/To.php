@@ -9,14 +9,22 @@ namespace ControlBit\Dto\Attribute;
  * Good in case when we have some backward compatibility or so.
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::IS_REPEATABLE)]
-final class MapTo
+readonly final class To
 {
-    public function __construct(private readonly string $member)
+    public function __construct(
+        private ?string $member = null,
+        private ?string $setter = null,
+    )
     {
     }
 
-    public function getMember(): string
+    public function getMember(): ?string
     {
         return $this->member;
+    }
+
+    public function getSetter(): ?string
+    {
+        return $this->setter;
     }
 }

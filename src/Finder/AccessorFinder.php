@@ -14,6 +14,7 @@ use ControlBit\Dto\Bag\TypeBag;
 use ControlBit\Dto\Contract\Accessor\AccessorInterface;
 use ControlBit\Dto\Contract\Accessor\GetterInterface;
 use ControlBit\Dto\Contract\Accessor\SetterInterface;
+use ControlBit\Dto\MetaData\Map\MapMetadata;
 use ControlBit\Dto\Util\TypeTool;
 use function ControlBit\Dto\instantiate_attributes;
 
@@ -28,8 +29,8 @@ readonly final class AccessorFinder
     }
 
     public function find(
-        \ReflectionObject   $reflectionObject,
-        \ReflectionProperty $reflectionProperty,
+        \ReflectionObject|\ReflectionClass $reflectionObject,
+        \ReflectionProperty                $reflectionProperty,
     ): AccessorInterface {
         return new Accessor(
             $this->findSetter($reflectionObject, $reflectionProperty),
@@ -38,12 +39,12 @@ readonly final class AccessorFinder
     }
 
     /**
-     * @param  \ReflectionClass<object>  $reflectionClass
-     * @param  \ReflectionProperty       $reflectionProperty
+     * @param  \ReflectionClass<object>|\ReflectionObject<object>  $reflectionClass
+     * @param  \ReflectionProperty                                 $reflectionProperty
      */
-    private function findSetter(
-        \ReflectionClass    $reflectionClass,
-        \ReflectionProperty $reflectionProperty,
+    public function findSetter(
+        \ReflectionObject|\ReflectionClass $reflectionClass,
+        \ReflectionProperty                $reflectionProperty,
     ): ?SetterInterface {
 
         $methodName = \sprintf('set%s', \ucfirst($reflectionProperty->name));
@@ -76,26 +77,51 @@ readonly final class AccessorFinder
     }
 
     /**
-     * @param  \ReflectionClass<object>  $reflectionClass
+     * @param  \ReflectionClass<object>|\ReflectionObject<object>  $reflectionClass
      */
-    private function findGetter(
-        \ReflectionClass    $reflectionClass,
-        \ReflectionProperty $reflectionProperty,
+    public function findGetter(
+        \ReflectionObject|\ReflectionClass                $reflectionClass,
+        \ReflectionProperty|\ReflectionMethod|MapMetadata $member,
     ): ?GetterInterface {
-        if ($reflectionProperty->isPublic()) {
-            return new PropertyGetter(
-                $reflectionProperty->name,
-                AttributeBag::fromArray(instantiate_attributes($reflectionProperty))
+
+        if ($member instanceof MapMetadata) {
+            switch (true) {
+                case $member->getSourceMember() && $reflectionClass->hasProperty($member->getSourceMember()):
+                    $member = $reflectionClass->getProperty($member->getSourceMember());
+                    break;
+                case $member->getSourceMethod() && $reflectionClass->hasMethod($member->getSourceMethod()):
+                    $member = $reflectionClass->getMethod($member->getSourceMethod());
+                    break;
+                default:
+                    return null;
+            }
+        }
+
+        if ($member instanceof \ReflectionMethod) {
+            return new MethodGetter(
+                $member->name,
+                new TypeBag(TypeTool::getReflectionTypes($member)),
+                AttributeBag::fromArray(instantiate_attributes($reflectionClass->getMethod($member->name)),
+                )
             );
         }
 
-        foreach ($this->generatePossibleGetterMethodNames($reflectionProperty->name) as $methodName) {
+        if ($member->isPublic()) {
+            return new PropertyGetter(
+                $member->name,
+                new TypeBag(TypeTool::getReflectionTypes($member)),
+                AttributeBag::fromArray(instantiate_attributes($member))
+            );
+        }
+
+        foreach ($this->generatePossibleGetterMethodNames($member->name) as $methodName) {
             if (!$reflectionClass->hasMethod($methodName)) {
                 continue;
             }
 
             return new MethodGetter(
                 $methodName,
+                new TypeBag(TypeTool::getReflectionTypes($member)),
                 AttributeBag::fromArray(instantiate_attributes($reflectionClass->getMethod($methodName)),
                 )
             );

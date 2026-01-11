@@ -14,7 +14,7 @@ final readonly class NonConstructedDelegate implements DestinationFactoryInterfa
         Mapper                $mapper,
         object                $source,
         ClassMetadata         $sourceClassMetadata,
-        MapMetadataCollection $sourceMapMetadataCollection,
+        MapMetadataCollection $mapMetadataCollection,
         ?string               $destination,
     ): object|string|null {
 
