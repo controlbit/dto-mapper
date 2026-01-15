@@ -14,6 +14,7 @@ final class ArrayToObject implements ValueConverterInterface
 {
     public function supports(SetterInterface $setter, mixed $value): bool
     {
+
         if (\is_object($value) || !\is_iterable($value)) {
             return false;
         }

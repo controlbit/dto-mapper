@@ -47,11 +47,6 @@ final readonly class ClassMetadata implements AttributedInterface
         return $this->attributes;
     }
 
-    public function isDoctrineEntity(): bool
-    {
-        return $this->attributes->has(Entity::class);
-    }
-
     public function getIdentifierProperty(): ?PropertyMetadata
     {
         foreach ($this->properties as $property) {

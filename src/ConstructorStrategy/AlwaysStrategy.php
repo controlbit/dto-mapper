@@ -16,6 +16,7 @@ use ControlBit\Dto\Finder\AccessorFinder;
 use ControlBit\Dto\Mapper\Mapper;
 use ControlBit\Dto\Mapper\ValueConverter;
 use ControlBit\Dto\MetaData\Class\ClassMetadata;
+use ControlBit\Dto\MetaData\Class\ClassMetadataFactory;
 use ControlBit\Dto\MetaData\Map\MapMetadataCollection;
 use ControlBit\Dto\MetaData\Map\MapMetadata;
 use ControlBit\Dto\Util\TypeTool;
@@ -32,6 +33,7 @@ final readonly class AlwaysStrategy implements ConstructorStrategyInterface
 
     public function __construct(
         private ValueConverter $valueConverter,
+        private ClassMetadataFactory $objectMetadataFactory,
     ) {
     }
 

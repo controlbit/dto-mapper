@@ -11,11 +11,11 @@ class ArrayCollectionTest extends LibraryTestCase
     public function testMappingObjectWithArrayToObjectWithArrayCollection(): void
     {
         $from = new class() {
-            #[Collection]
             public array $foo = ['baz', 'qux', 'fruit'];
         };
 
         $to = new class() {
+            #[Collection(['reverse' => true])]
             public ArrayCollection $foo;
         };
 

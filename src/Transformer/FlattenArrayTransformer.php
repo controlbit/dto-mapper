@@ -6,10 +6,11 @@ namespace ControlBit\Dto\Transformer;
 use ControlBit\Dto\Contract\Transformer\TransformerInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 
-final class FirstElementOfArrayTransformer implements TransformerInterface
+final class FlattenArrayTransformer implements TransformerInterface
 {
     /**
      * @param  array<scalar>  $value
+     * @return scalar
      * {@inheritDoc}
      */
     public function transform(mixed $value, array $options = []): mixed
@@ -19,6 +20,7 @@ final class FirstElementOfArrayTransformer implements TransformerInterface
 
     /**
      * @param  scalar  $value
+     * @return array<scalar>
      * {@inheritDoc}
      */
     public function reverse(mixed $value, array $options = []): mixed

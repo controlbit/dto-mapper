@@ -9,7 +9,7 @@ A DTO Mapper library and Symfony bundle
 
 ## Using Composer 
 ```bash
-composer require controlbit/dto
+composer require controlbit/dto-mapper
 ```
 
 ## For Symfony users

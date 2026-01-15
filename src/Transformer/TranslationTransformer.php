@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace ControlBit\Dto\Transformer;
 
 use ControlBit\Dto\Contract\Transformer\TransformerInterface;
+use ControlBit\Dto\Exception\NotImplementedException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class TranslationTransformer implements TransformerInterface
@@ -36,15 +37,7 @@ final class TranslationTransformer implements TransformerInterface
      */
     public function reverse(mixed $value, array $options = []): mixed
     {
-        if (null === $value) {
-            return null;
-        }
-
-        if ($options['ignoreWhenMappingOnDto']) {
-            return $value;
-        }
-
-        return $this->translate($value, $options);
+       throw new NotImplementedException('Reverse transformation is not supported for TranslationTransformer.');
     }
 
     private function translate(mixed $value, array $options): mixed

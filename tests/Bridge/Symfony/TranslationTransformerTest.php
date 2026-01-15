@@ -13,11 +13,11 @@ class TranslationTransformerTest extends SymfonyTestCase
     public function testSimpleTranslate(): void
     {
         $from = new class() {
-            #[Translate]
             public string $foo = 'foo';
         };
 
         $to = new class() {
+            #[Translate]
             public string $foo;
         };
 
@@ -29,11 +29,11 @@ class TranslationTransformerTest extends SymfonyTestCase
     public function testTranslateWithModifier(): void
     {
         $from = new class() {
-            #[Translate(modifier: 'strtoupper')]
             public string $foo = 'foo';
         };
 
         $to = new class() {
+            #[Translate(modifier: 'strtoupper')]
             public string $foo;
         };
 
@@ -45,11 +45,11 @@ class TranslationTransformerTest extends SymfonyTestCase
     public function testTranslateWithModifierOfStaticClass(): void
     {
         $from = new class() {
-            #[Translate(modifier: [StringModifier::class, 'toUpperCase'])]
             public string $foo = 'foo';
         };
 
         $to = new class() {
+            #[Translate(modifier: [StringModifier::class, 'toUpperCase'])]
             public string $foo;
         };
 

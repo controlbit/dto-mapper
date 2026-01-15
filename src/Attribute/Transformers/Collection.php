@@ -13,8 +13,8 @@ use ControlBit\Dto\Transformer\ArrayCollectionTransformer;
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
 final readonly class Collection extends Transformer
 {
-    public function __construct()
+    public function __construct($options = [])
     {
-        parent::__construct(ArrayCollectionTransformer::class);
+        parent::__construct(ArrayCollectionTransformer::class, $options);
     }
 }

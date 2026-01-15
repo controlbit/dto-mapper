@@ -62,7 +62,7 @@ final class Factory
             ]
         );
 
-        $alwaysStrategy = new AlwaysStrategy($valueConverter);
+        $alwaysStrategy = new AlwaysStrategy($valueConverter, $objectMetadataFactory);
         $neverStrategy  = new NeverStrategy($mapPrivateProperties);
 
         $strategyCollection = new StrategyCollection(

@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace ControlBit\Dto\Mapper;
 
+use ControlBit\Dto\Attribute\Dto;
+use ControlBit\Dto\Attribute\From;
 use ControlBit\Dto\Contract\Accessor\GetterInterface;
 use ControlBit\Dto\Contract\Accessor\SetterInterface;
 use ControlBit\Dto\Contract\Mapper\ValueConverterInterface;
@@ -10,6 +12,7 @@ use ControlBit\Dto\Contract\Transformer\TransformableInterface;
 use ControlBit\Dto\Contract\Transformer\TransformerInterface;
 use ControlBit\Dto\Exception\InvalidArgumentException;
 use ControlBit\Dto\MetaData\Class\ClassMetadata;
+use Doctrine\ORM\Mapping\Entity;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 final readonly class ValueConverter
@@ -30,8 +33,16 @@ final readonly class ValueConverter
         SetterInterface $setter,
         mixed           $value,
     ): mixed {
-        if ($getter instanceof TransformableInterface) {
-            $value = $this->transform($value, $sourceMetadata, $getter);
+        $isSourceTransformerOnly = $this->shouldFollowSourceTransformerOnly($sourceMetadata, $getter);
+
+        if ($getter instanceof TransformableInterface && $isSourceTransformerOnly) {
+            $isReverse = $this->shouldReverseTransform($getter, $sourceMetadata, true);
+            $value = $this->transform($value, $getter, $isReverse);
+        }
+
+        if ($setter instanceof TransformableInterface && !$isSourceTransformerOnly) {
+            $isReverse = $this->shouldReverseTransform($setter, $sourceMetadata, false);
+            $value = $this->transform($value, $setter, $isReverse);
         }
 
         foreach ($this->valueConverters as $valueConverter) {
@@ -42,27 +53,23 @@ final readonly class ValueConverter
             $value = $valueConverter->execute($mapper, $setter, $value);
         }
 
-        if ($setter instanceof TransformableInterface) {
-            $value = $this->transform($value, $sourceMetadata, $setter);
-        }
-
         return $value;
     }
 
     private function transform(
         mixed                  $value,
-        ClassMetadata          $sourceMetadata,
         TransformableInterface $transformable,
+        bool                   $isReverseTransform,
     ): mixed {
         if (!$transformable->hasTransformer()) {
             return $value;
         }
 
-        $classOrId   = $transformable->getClassOrId();
-        $options     = $transformable->getOptions();
-        $transformer = $this->instantiateTransformer($classOrId, $options); // @phpstan-ignore-line
+        $classOrId            = $transformable->getClassOrId();
+        $options              = $transformable->getOptions();
+        $transformer          = $this->instantiateTransformer($classOrId); // @phpstan-ignore-line
 
-        if ($sourceMetadata->isDoctrineEntity()) {
+        if ($isReverseTransform) {
             return $transformer->reverse($value, $options);
         }
 
@@ -113,5 +120,48 @@ final readonly class ValueConverter
                 TransformerInterface::class,
             )
         );
+    }
+
+    private function shouldFollowSourceTransformerOnly(
+        ClassMetadata   $sourceMetadata,
+        GetterInterface $getter,
+    ): bool {
+        if (!$sourceMetadata->getAttributes()->has(Entity::class)) {
+            return false;
+        }
+
+        if ($sourceMetadata->getAttributes()->has(Dto::class)) {
+            if (null !== $sourceMetadata->getAttributes()->get(Dto::class)?->getEntityClass()) {
+                return true;
+            }
+        }
+
+        return $getter->getAttributes()->has(From::class);
+    }
+
+    private function shouldReverseTransform(
+        TransformableInterface $transformable,
+        ClassMetadata          $sourceMetadata,
+        bool                   $isSourceAttributesOnly,
+    ): bool {
+        $reverseOption = $transformable->getOptions()['reverse'] ?? null;
+
+        if (true === $reverseOption) {
+            return true;
+        }
+
+        if (false === $reverseOption) {
+            return false;
+        }
+
+        if (!$isSourceAttributesOnly) {
+            return false;
+        }
+
+        if ($sourceMetadata->getFqcn() !== \stdClass::class) {
+            return false;
+        }
+
+        return true;
     }
 }

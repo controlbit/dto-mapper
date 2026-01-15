@@ -48,8 +48,10 @@ readonly class DtoArgumentResolver implements ValueResolverInterface
             return false;
         }
 
-        if (null === find_attribute($type,
-                                    Dto::class) && \count($argument->getAttributesOfType(RequestDto::class)) === 0) {
+        if (
+            null === find_attribute($type, Dto::class) &&
+            \count($argument->getAttributesOfType(RequestDto::class)) === 0
+        ) {
             return false;
         }
 

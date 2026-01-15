@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace ControlBit\Dto\MetaData\Map;
 
-use ControlBit\Dto\Contract\Transformer\TransformableInterface;
-
 final class MapMetadata
 {
     /**
