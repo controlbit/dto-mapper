@@ -8,10 +8,10 @@ interface TransformerInterface
     /**
      * Used when transforming from DTO to DESTINATION-OBJECT
      */
-    public function transform(mixed $value): mixed;
+    public function transform(mixed $value, array $options = []): mixed;
 
     /**
      * Used when transforming from DOCTRINE-ENTITY/Array/Request to DTO
      */
-    public function reverse(mixed $value): mixed;
+    public function reverse(mixed $value, array $options = []): mixed;
 }

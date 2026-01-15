@@ -8,7 +8,9 @@ interface TransformableInterface
     /**
      * @return string|null
      */
-    public function getTransformerClassOrId(): ?string;
+    public function getClassOrId(): ?string;
+
+    public function getOptions(): ?array;
 
     public function hasTransformer(): bool;
 }

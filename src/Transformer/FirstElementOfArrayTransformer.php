@@ -12,7 +12,7 @@ final class FirstElementOfArrayTransformer implements TransformerInterface
      * @param  array<scalar>  $value
      * {@inheritDoc}
      */
-    public function transform(mixed $value): mixed
+    public function transform(mixed $value, array $options = []): mixed
     {
         return $value[0];
     }
@@ -21,7 +21,7 @@ final class FirstElementOfArrayTransformer implements TransformerInterface
      * @param  scalar  $value
      * {@inheritDoc}
      */
-    public function reverse(mixed $value): mixed
+    public function reverse(mixed $value, array $options = []): mixed
     {
         return [$value];
     }

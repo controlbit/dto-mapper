@@ -5,7 +5,7 @@ namespace ControlBit\Dto\MetaData\Map;
 
 use ControlBit\Dto\Contract\Transformer\TransformableInterface;
 
-final class MapMetadata implements TransformableInterface
+final class MapMetadata
 {
     /**
      * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
@@ -29,19 +29,6 @@ final class MapMetadata implements TransformableInterface
     public function getDestinationMember(): ?string
     {
         return $this->destinationMember;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getTransformerClassOrId(): ?string
-    {
-        return $this->transformer;
-    }
-
-    public function hasTransformer(): bool
-    {
-        return $this->transformer !== null;
     }
 
     public function setMappedInConstructor(): self

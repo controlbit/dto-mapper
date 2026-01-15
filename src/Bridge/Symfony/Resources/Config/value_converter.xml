@@ -16,6 +16,7 @@
                 class="ControlBit\Dto\Mapper\ValueConverter"
         >
             <argument type="tagged_iterator" tag="dto_bundle.value_converter"/>
+            <argument type="service" id="service_container" on-invalid="null"/>
         </service>
 
         <service

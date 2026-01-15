@@ -25,7 +25,7 @@ class Extension extends SymfonyExtension
         if (null === ConstructorStrategy::tryFrom($config['constructor_strategy'])) {
             throw new InvalidConfigurationException(
                 \sprintf("Constructor Strategy invalid. Can be: %s",
-                         implode(ConstructorStrategy::all()))
+                         \implode(',', ConstructorStrategy::all()))
             );
         }
 
@@ -45,5 +45,6 @@ class Extension extends SymfonyExtension
         $loader->load('value_converter.xml');
         $loader->load('mapper.xml');
         $loader->load('event_listener.xml');
+        $loader->load('transformer.xml');
     }
 }

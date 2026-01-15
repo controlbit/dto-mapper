@@ -19,11 +19,12 @@ readonly class Transformer
      * @var class-string<TransformerInterface>
      */
     private string $transformerClass;
+    private array  $options;
 
     /**
      * @param  class-string  $transformerClass
      */
-    public function __construct(string $transformerClass)
+    public function __construct(string $transformerClass, array $options = [])
     {
         if (!\class_exists($transformerClass)) {
             throw new InvalidArgumentException(\sprintf('Transformer Class "%s" does not exist.', $transformerClass));
@@ -40,6 +41,7 @@ readonly class Transformer
         }
 
         $this->transformerClass = $transformerClass;
+        $this->options          = $options;
     }
 
     /**
@@ -48,5 +50,10 @@ readonly class Transformer
     public function getTransformerIdOrClass(): string
     {
         return $this->transformerClass;
+    }
+
+    public function getOptions(): array
+    {
+        return $this->options;
     }
 }

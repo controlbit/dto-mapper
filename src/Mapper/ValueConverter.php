@@ -24,11 +24,11 @@ final readonly class ValueConverter
     }
 
     public function map(
-        Mapper            $mapper,
-        ClassMetadata     $sourceMetadata,
-        GetterInterface   $getter,
-        SetterInterface   $setter,
-        mixed             $value,
+        Mapper          $mapper,
+        ClassMetadata   $sourceMetadata,
+        GetterInterface $getter,
+        SetterInterface $setter,
+        mixed           $value,
     ): mixed {
         if ($getter instanceof TransformableInterface) {
             $value = $this->transform($value, $sourceMetadata, $getter);
@@ -58,23 +58,24 @@ final readonly class ValueConverter
             return $value;
         }
 
-        $transformerClassOrId = $transformable->getTransformerClassOrId();
-        $transformer          = $this->instantiateTransformer($transformerClassOrId); // @phpstan-ignore-line
+        $classOrId   = $transformable->getClassOrId();
+        $options     = $transformable->getOptions();
+        $transformer = $this->instantiateTransformer($classOrId, $options); // @phpstan-ignore-line
 
         if ($sourceMetadata->isDoctrineEntity()) {
-            return $transformer->reverse($value);
+            return $transformer->reverse($value, $options);
         }
 
-        return $transformer->transform($value);
+        return $transformer->transform($value, $options);
     }
 
     /**
-     * @param  string|class-string  $transformerClassOrId
+     * @param  string|class-string  $classOrId
      */
-    private function instantiateTransformer(string $transformerClassOrId): TransformerInterface
+    private function instantiateTransformer(string $classOrId): TransformerInterface
     {
-        if (null !== $this->container) {
-            $transformerService = $this->container->get($transformerClassOrId);
+        if (null !== $this->container && $this->container->has($classOrId)) {
+            $transformerService = $this->container->get($classOrId);
         }
 
         if (isset($transformerService)) {
@@ -84,10 +85,10 @@ final readonly class ValueConverter
             return $transformerService;
         }
 
-        $this->validateTransformer($transformerClassOrId);
+        $this->validateTransformer($classOrId);
 
         /* @phpstan-ignore-next-line */
-        return (new \ReflectionClass($transformerClassOrId))->newInstanceWithoutConstructor();
+        return (new \ReflectionClass($classOrId))->newInstanceWithoutConstructor();
     }
 
     private function validateTransformer(object|string $transformerClassOrObject): void

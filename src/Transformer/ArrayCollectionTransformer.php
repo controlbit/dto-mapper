@@ -12,7 +12,7 @@ final class ArrayCollectionTransformer implements TransformerInterface
      * @param  array<int|string, mixed>  $value
      * {@inheritDoc}
      */
-    public function transform(mixed $value): mixed
+    public function transform(mixed $value, array $options = []): mixed
     {
         return new ArrayCollection($value);
     }
@@ -21,7 +21,7 @@ final class ArrayCollectionTransformer implements TransformerInterface
      * @param  ArrayCollection<int|string, mixed>  $value
      * {@inheritDoc}
      */
-    public function reverse(mixed $value): mixed
+    public function reverse(mixed $value, array $options = []): mixed
     {
         return $value->toArray();
     }

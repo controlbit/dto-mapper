@@ -28,9 +28,14 @@ final readonly class PropertyGetter implements GetterInterface, TransformableInt
         return $this->attributes;
     }
 
-    public function getTransformerClassOrId(): ?string
+    public function getClassOrId(): ?string
     {
         return $this->attributes->get(Transformer::class)?->getTransformerIdOrClass();
+    }
+
+    public function getOptions(): ?array
+    {
+        return $this->attributes->get(Transformer::class)?->getOptions();
     }
 
     public function hasTransformer(): bool

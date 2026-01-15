@@ -30,7 +30,7 @@ readonly class RequestDto
                 continue;
             }
 
-            if (!\is_string($part) || null === RequestPart::tryFrom($part)) {
+            if (null === RequestPart::tryFrom($part)) {
                 throw new InvalidArgumentException(
                     \sprintf('Invalid value for Request DTO parts. Possible are %s',
                              \implode(', ', RequestPart::allValues()))

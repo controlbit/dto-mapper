@@ -12,5 +12,4 @@ class SymfonyTestCase extends WebTestCase
     {
         return SymfonyTestKernel::class;
     }
-
 }
