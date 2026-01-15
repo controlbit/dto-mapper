@@ -5,7 +5,7 @@ namespace ControlBit\Dto\CaseTransformer;
 
 use ControlBit\Dto\Contract\CaseTransformerInterface;
 
-final class SnakeCaseToCamelCaseTransformer implements CaseTransformerInterface
+final class CamelCaseToSnakeCaseTransformer implements CaseTransformerInterface
 {
     /**
      * {@inheritDoc}
@@ -13,7 +13,7 @@ final class SnakeCaseToCamelCaseTransformer implements CaseTransformerInterface
     public function transform(array|string $arrayOrString): array|string
     {
         if (\is_string($arrayOrString)) {
-            return $this->snakeToCamel($arrayOrString);
+            return $this->camelToSnake($arrayOrString);
         }
 
         $result = [];
@@ -27,14 +27,14 @@ final class SnakeCaseToCamelCaseTransformer implements CaseTransformerInterface
                 continue;
             }
 
-            $result[$this->snakeToCamel($key)] = $value;
+            $result[$this->camelToSnake($key)] = $value;
         }
 
         return $result;
     }
 
-    private function snakeToCamel(string $string): string
+    private function camelToSnake(string $string): string
     {
-        return \lcfirst(\str_replace(' ', '', \ucwords(\str_replace('_', ' ', $string))));
+        return \strtolower(\preg_replace('/(?<!^)[A-Z]/', '_$0', $string));
     }
 }

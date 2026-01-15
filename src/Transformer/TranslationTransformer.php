@@ -53,15 +53,22 @@ final class TranslationTransformer implements TransformerInterface
             return $value;
         }
 
-        $prefix = $options['prefix'];
+        $modifier = $options['modifier'] ?? null;
 
-        $translationKey = $prefix !== null ? $prefix.$value : $value;
+        if (\is_string($modifier)) {
+            $value = \call_user_func($modifier, $value);
+        }
+
+        if (\is_array($modifier)) {
+            [$class, $method] = $modifier;
+            $value = \call_user_func([$class, $method], $value);
+        }
 
         return $this->translator->trans(
-            $translationKey,
+            $value,
             [],
-            $prefix['domain'] ?? null,
-            $prefix['locale'] ?? null,
+            $options['domain'] ?? null,
+            $options['locale'] ?? null,
         );
     }
 

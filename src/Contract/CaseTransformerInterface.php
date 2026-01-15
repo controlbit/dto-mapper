@@ -6,9 +6,9 @@ namespace ControlBit\Dto\Contract;
 interface CaseTransformerInterface
 {
     /**
-     * @param  array<string, mixed>  $array
+     * @param  array<string, mixed>|string  $arrayOrString
      *
-     * @return array<string, mixed>
+     * @return array<string, mixed>|string
      */
-    public function transform(array $array): array;
+    public function transform(array|string $arrayOrString): array|string;
 }

@@ -5,11 +5,12 @@ namespace ControlBit\Dto\Tests\Bridge\Symfony;
 
 use ControlBit\Dto\Attribute\Transformers\Translate;
 use ControlBit\Dto\Contract\Mapper\MapperInterface;
+use ControlBit\Dto\Tests\Bridge\Symfony\App\Helper\StringModifier;
 use ControlBit\Dto\Tests\SymfonyTestCase;
 
 class TranslationTransformerTest extends SymfonyTestCase
 {
-    public function testToEnum(): void
+    public function testSimpleTranslate(): void
     {
         $from = new class() {
             #[Translate]
@@ -23,5 +24,37 @@ class TranslationTransformerTest extends SymfonyTestCase
         $mappedObject = self::getContainer()->get(MapperInterface::class)->map($from, $to);
 
         $this->assertEquals('Just Foo', $mappedObject->foo);
+    }
+
+    public function testTranslateWithModifier(): void
+    {
+        $from = new class() {
+            #[Translate(modifier: 'strtoupper')]
+            public string $foo = 'foo';
+        };
+
+        $to = new class() {
+            public string $foo;
+        };
+
+        $mappedObject = self::getContainer()->get(MapperInterface::class)->map($from, $to);
+
+        $this->assertEquals('FOO', $mappedObject->foo);
+    }
+
+    public function testTranslateWithModifierOfStaticClass(): void
+    {
+        $from = new class() {
+            #[Translate(modifier: [StringModifier::class, 'toUpperCase'])]
+            public string $foo = 'foo';
+        };
+
+        $to = new class() {
+            public string $foo;
+        };
+
+        $mappedObject = self::getContainer()->get(MapperInterface::class)->map($from, $to);
+
+        $this->assertEquals('FOO', $mappedObject->foo);
     }
 }
