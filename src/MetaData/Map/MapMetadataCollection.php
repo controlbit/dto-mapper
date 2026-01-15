@@ -36,8 +36,6 @@ final class MapMetadataCollection implements \IteratorAggregate, \Countable
             $existingMapMetadata->getSourceMethod() ?? $mapMetadata->getSourceMethod(),
             $existingMapMetadata->getDestinationMember() ?? $mapMetadata->getDestinationMember(),
             $existingMapMetadata->getDestinationMethod() ?? $mapMetadata->getDestinationMethod(),
-            $existingMapMetadata->getSourceTransformer() ?? $mapMetadata->getSourceTransformer(),
-            $existingMapMetadata->getDestinationTransformer() ?? $mapMetadata->getDestinationTransformer(),
             $existingMapMetadata->isMappedInConstructor() || $mapMetadata->isMappedInConstructor(),
         );
 

@@ -37,12 +37,12 @@ final readonly class ValueConverter
 
         if ($getter instanceof TransformableInterface && $isSourceTransformerOnly) {
             $isReverse = $this->shouldReverseTransform($getter, $sourceMetadata, true);
-            $value = $this->transform($value, $getter, $isReverse);
+            $value     = $this->transform($value, $getter, $isReverse);
         }
 
         if ($setter instanceof TransformableInterface && !$isSourceTransformerOnly) {
             $isReverse = $this->shouldReverseTransform($setter, $sourceMetadata, false);
-            $value = $this->transform($value, $setter, $isReverse);
+            $value     = $this->transform($value, $setter, $isReverse);
         }
 
         foreach ($this->valueConverters as $valueConverter) {
@@ -65,9 +65,9 @@ final readonly class ValueConverter
             return $value;
         }
 
-        $classOrId            = $transformable->getClassOrId();
-        $options              = $transformable->getOptions();
-        $transformer          = $this->instantiateTransformer($classOrId); // @phpstan-ignore-line
+        $classOrId   = $transformable->getClassOrId();
+        $options     = $transformable->getOptions();
+        $transformer = $this->instantiateTransformer($classOrId); // @phpstan-ignore-line
 
         if ($isReverseTransform) {
             return $transformer->reverse($value, $options);

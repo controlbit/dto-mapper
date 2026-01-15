@@ -5,7 +5,6 @@ namespace ControlBit\Dto\MetaData\Map;
 
 use ControlBit\Dto\Attribute\From;
 use ControlBit\Dto\Attribute\To;
-use ControlBit\Dto\Attribute\Transformer;
 use ControlBit\Dto\Bag\AttributeBag;
 use ControlBit\Dto\MetaData\Class\ClassMetadata;
 use ControlBit\Dto\MetaData\Property\PropertyMetadata;
@@ -34,8 +33,6 @@ final class MapMetadataFactory
                     null,
                     $propertyMetadata->getName(),
                     null,
-                    null,
-                    $this->getTransformer($propertyMetadata)
                 ),
             });
         }
@@ -53,8 +50,6 @@ final class MapMetadataFactory
             null,
             $attribute->getMember(),
             $attribute->getSetter(),
-            $this->getTransformer($propertyMetadata),
-            null,
         );
     }
 
@@ -68,21 +63,6 @@ final class MapMetadataFactory
             $attribute->getGetter(),
             $propertyMetadata->getName(),
             null,
-            null,
-            $this->getTransformer($propertyMetadata),
         );
-    }
-
-    private function getTransformer(PropertyMetadata $propertyMetadata): ?string
-    {
-        foreach ($propertyMetadata->getAttributes() as $attribute) {
-            if (!is_a($attribute, Transformer::class, true)) {
-                continue;
-            }
-
-            return $attribute->getTransformerIdOrClass();
-        }
-
-        return null;
     }
 }

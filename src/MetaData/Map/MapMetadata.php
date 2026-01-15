@@ -13,8 +13,6 @@ final class MapMetadata
         private readonly ?string $sourceMethod = null,
         private readonly ?string $destinationMember = null,
         private readonly ?string $destinationMethod = null,
-        private readonly ?string $sourceTransformer = null,
-        private readonly ?string $destinationTransformer = null,
         private bool             $mappedInConstructor = false,
     ) {
     }
@@ -49,15 +47,5 @@ final class MapMetadata
     public function getSourceMethod(): ?string
     {
         return $this->sourceMethod;
-    }
-
-    public function getSourceTransformer(): ?string
-    {
-        return $this->sourceTransformer;
-    }
-
-    public function getDestinationTransformer(): ?string
-    {
-        return $this->destinationTransformer;
     }
 }
