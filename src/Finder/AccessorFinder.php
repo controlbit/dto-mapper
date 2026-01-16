@@ -59,10 +59,13 @@ readonly final class AccessorFinder
             );
         }
 
+        $attributeBag = AttributeBag::fromArray(instantiate_attributes($reflectionProperty));
+
         $args = [
             $reflectionProperty->name,
             new TypeBag(TypeTool::getReflectionTypes($reflectionProperty)),
-            AttributeBag::fromArray(instantiate_attributes($reflectionProperty)),
+            $attributeBag,
+
         ];
 
         if ($reflectionProperty->isPublic()) {

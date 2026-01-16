@@ -3,14 +3,14 @@ declare(strict_types=1);
 
 namespace ControlBit\Dto\Contract\Transformer;
 
+use ControlBit\Dto\Attribute\Transformer;
+
 interface TransformableInterface
 {
     /**
-     * @return string|null
+     * @return Transformer[]
      */
-    public function getClassOrId(): ?string;
+    public function getTransformerAttributes(): array;
 
-    public function getOptions(): ?array;
-
-    public function hasTransformer(): bool;
+    public function hasTransformersAttributes(): bool;
 }

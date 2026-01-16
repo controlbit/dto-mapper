@@ -62,6 +62,28 @@ final class AttributeBag implements \IteratorAggregate
     }
 
     /**
+     * @template T of object
+     * @param  class-string<T>  $instanceClass
+     *
+     * @return T[]
+     */
+    public function getAllOf(string $instanceClass): array
+    {
+        $attributes = [];
+        foreach ($this->attributes as $attribute) {
+            if (\get_class($attribute) === $instanceClass) {
+                $attributes[] = $attribute;
+            }
+
+            if (\is_subclass_of($attribute, $instanceClass)) {
+                $attributes[] = $attribute;
+            }
+        }
+
+        return $attributes;
+    }
+
+    /**
      * @param  object[]  $attributes
      */
     public static function fromArray(array $attributes): self

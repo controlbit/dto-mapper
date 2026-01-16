@@ -5,6 +5,7 @@ namespace ControlBit\Dto\Mapper;
 
 use ControlBit\Dto\Attribute\Dto;
 use ControlBit\Dto\Attribute\From;
+use ControlBit\Dto\Attribute\Transformer;
 use ControlBit\Dto\Contract\Accessor\GetterInterface;
 use ControlBit\Dto\Contract\Accessor\SetterInterface;
 use ControlBit\Dto\Contract\Mapper\ValueConverterInterface;
@@ -36,13 +37,11 @@ final readonly class ValueConverter
         $isSourceTransformerOnly = $this->shouldFollowSourceTransformerOnly($sourceMetadata, $getter);
 
         if ($getter instanceof TransformableInterface && $isSourceTransformerOnly) {
-            $isReverse = $this->shouldReverseTransform($getter, $sourceMetadata, true);
-            $value     = $this->transform($value, $getter, $isReverse);
+            $value = $this->transform($value, $sourceMetadata, $getter, true);
         }
 
         if ($setter instanceof TransformableInterface && !$isSourceTransformerOnly) {
-            $isReverse = $this->shouldReverseTransform($setter, $sourceMetadata, false);
-            $value     = $this->transform($value, $setter, $isReverse);
+            $value = $this->transform($value, $sourceMetadata, $setter, false);
         }
 
         foreach ($this->valueConverters as $valueConverter) {
@@ -58,22 +57,28 @@ final readonly class ValueConverter
 
     private function transform(
         mixed                  $value,
+        ClassMetadata          $sourceMetadata,
         TransformableInterface $transformable,
-        bool                   $isReverseTransform,
+        bool                   $isSourceTransformerOnly,
     ): mixed {
-        if (!$transformable->hasTransformer()) {
+        if (!$transformable->hasTransformersAttributes()) {
             return $value;
         }
 
-        $classOrId   = $transformable->getClassOrId();
-        $options     = $transformable->getOptions();
-        $transformer = $this->instantiateTransformer($classOrId); // @phpstan-ignore-line
+        $transformerAttributes = $transformable->getTransformerAttributes();
 
-        if ($isReverseTransform) {
-            return $transformer->reverse($value, $options);
+        foreach ($transformerAttributes as $attribute) {
+            $classOrId           = $attribute->getTransformerIdOrClass();
+            $options             = $attribute->getOptions();
+            $transformerInstance = $this->instantiateTransformer($classOrId); // @phpstan-ignore-line
+            $isReverseTransform  = $this->shouldReverseTransform($attribute, $sourceMetadata, $isSourceTransformerOnly);
+
+            $value = $isReverseTransform
+                ? $transformerInstance->reverse($value, $options)
+                : $transformerInstance->transform($value, $options);
         }
 
-        return $transformer->transform($value, $options);
+        return $value;
     }
 
     /**
@@ -140,11 +145,11 @@ final readonly class ValueConverter
     }
 
     private function shouldReverseTransform(
-        TransformableInterface $transformable,
-        ClassMetadata          $sourceMetadata,
-        bool                   $isSourceAttributesOnly,
+        Transformer   $transformerAttribute,
+        ClassMetadata $sourceMetadata,
+        bool          $isSourceAttributesOnly,
     ): bool {
-        $reverseOption = $transformable->getOptions()['reverse'] ?? null;
+        $reverseOption = $transformerAttribute->getOptions()['reverse'] ?? null;
 
         if (true === $reverseOption) {
             return true;

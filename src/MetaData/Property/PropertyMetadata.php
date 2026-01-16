@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace ControlBit\Dto\MetaData\Property;
 
-use ControlBit\Dto\Attribute\Identifier;
-use ControlBit\Dto\Attribute\Ignore;
 use ControlBit\Dto\Attribute\Transformer;
 use ControlBit\Dto\Bag\AttributeBag;
 use ControlBit\Dto\Bag\TypeBag;
@@ -12,14 +10,14 @@ use ControlBit\Dto\Contract\Accessor\AccessorInterface;
 use ControlBit\Dto\Contract\AttributedInterface;
 use ControlBit\Dto\Contract\Transformer\TransformableInterface;
 
-final class PropertyMetadata implements AttributedInterface, TransformableInterface
+final readonly class PropertyMetadata implements AttributedInterface, TransformableInterface
 {
     public function __construct(
-        private readonly string            $name,
-        private readonly TypeBag           $type,
-        private readonly AccessorInterface $accessor,
-        private readonly AttributeBag      $attributes,
-        private readonly bool              $isPublic,
+        private string            $name,
+        private TypeBag           $type,
+        private AccessorInterface $accessor,
+        private AttributeBag      $attributes,
+        private bool              $isPublic,
     ) {
     }
 
@@ -48,21 +46,13 @@ final class PropertyMetadata implements AttributedInterface, TransformableInterf
         return $this->isPublic;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getClassOrId(): ?string
-    {
-        return $this->attributes->get(Transformer::class)?->getTransformerIdOrClass();
-    }
-
-    public function getOptions(): ?array
-    {
-        return $this->attributes->get(Transformer::class)?->getOptions();
-    }
-
-    public function hasTransformer(): bool
+    public function hasTransformersAttributes(): bool
     {
         return $this->attributes->has(Transformer::class);
+    }
+
+    public function getTransformerAttributes(): array
+    {
+        return $this->attributes->getAllOf(Transformer::class);
     }
 }
