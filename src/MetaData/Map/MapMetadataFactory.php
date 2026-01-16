@@ -13,27 +13,38 @@ final class MapMetadataFactory
 {
     public function create(ClassMetadata $sourceMetadata, ClassMetadata $destinationMetadata): MapMetadataCollection
     {
-        $mapMetadata = new MapMetadataCollection();
+        $mapMetadata               = new MapMetadataCollection();
+        $visitedDestinationMembers = [];
 
         foreach ($sourceMetadata->getProperties() as $propertyMetadata) {
             $attributes = $propertyMetadata->getAttributes();
 
-            if ($attributes->has(To::class)) {
-                $mapMetadata->merge($this->mapTo($propertyMetadata, $attributes));
+            if (!$attributes->has(To::class)) {
+                continue;
             }
+
+            $to     = $attributes->get(To::class);
+            $member = $to?->getMember();
+
+            if (\in_array($member, $visitedDestinationMembers, true)) {
+                continue;
+            }
+
+            $visitedDestinationMembers[] = $member;
+            $mapMetadata->add($this->mapTo($propertyMetadata, $attributes));
         }
 
         foreach ($destinationMetadata->getProperties() as $propertyMetadata) {
             $attributes = $propertyMetadata->getAttributes();
+            $member     = $propertyMetadata->getName();
 
-            $mapMetadata->merge(match (true) {
+            if (\in_array($member, $visitedDestinationMembers, true)) {
+                continue;
+            }
+
+            $mapMetadata->add(match (true) {
                 $attributes->has(From::class) => $this->mapFrom($propertyMetadata, $attributes),
-                default                       => new MapMetadata(
-                    $propertyMetadata->getName(),
-                    null,
-                    $propertyMetadata->getName(),
-                    null,
-                ),
+                default                       => new MapMetadata($member, null, $member, null),
             });
         }
 
