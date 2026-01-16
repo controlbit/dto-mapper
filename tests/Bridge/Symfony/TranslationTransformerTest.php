@@ -51,13 +51,29 @@ class TranslationTransformerTest extends SymfonyTestCase
         };
 
         $to = new class() {
-            #[Translate(modifier: [StringModifier::class, 'toUpperCase'])]
+            #[Translate(modifier: [StringModifier::class, 'modify'])]
             public string $foo;
         };
 
         $mappedObject = self::getContainer()->get(MapperInterface::class)->map($from, $to);
 
         $this->assertEquals('FOO', $mappedObject->foo);
+    }
+
+    public function testTranslateWithModifierOfStaticClassWithAdditionalArguments(): void
+    {
+        $from = new class() {
+            public string $foo = 'foo';
+        };
+
+        $to = new class() {
+            #[Translate(modifier: [StringModifier::class, 'modify', ['<-','->']])]
+            public string $foo;
+        };
+
+        $mappedObject = self::getContainer()->get(MapperInterface::class)->map($from, $to);
+
+        $this->assertEquals('<-FOO->', $mappedObject->foo);
     }
 
     public function testTranslateInCombinationWithEnumTransformer(): void

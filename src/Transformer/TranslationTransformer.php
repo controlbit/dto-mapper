@@ -53,8 +53,10 @@ final class TranslationTransformer implements TransformerInterface
         }
 
         if (\is_array($modifier)) {
+            $args = $modifier[2] ?? [];
             [$class, $method] = $modifier;
-            $value = \call_user_func([$class, $method], $value);
+
+            $value = \call_user_func([$class, $method], $value, ...$args);
         }
 
         return $this->translator->trans(

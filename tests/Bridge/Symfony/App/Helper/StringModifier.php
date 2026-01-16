@@ -5,8 +5,8 @@ namespace ControlBit\Dto\Tests\Bridge\Symfony\App\Helper;
 
 abstract class StringModifier
 {
-    public static function toUpperCase(string $value): string
+    public static function modify(string $value, ?string $prefix = null, ?string $suffix = null): string
     {
-        return \strtoupper($value);
+        return $prefix . \strtoupper($value) . $suffix;
     }
 }
