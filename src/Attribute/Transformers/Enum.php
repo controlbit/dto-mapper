@@ -19,12 +19,8 @@ final readonly class Enum extends Transformer
          * class-string<\BackedEnum>
          */
         string $class,
-        bool   $failWhenInvalidEnumValue = false,
-        array  $options                  = [],
+        array  $options = [],
     ) {
-        parent::__construct(EnumTransformer::class, $options + [
-            'class'                    => $class,
-            'failWhenInvalidEnumValue' => $failWhenInvalidEnumValue,
-        ]);
+        parent::__construct(EnumTransformer::class, $options + ['class' => $class]);
     }
 }
