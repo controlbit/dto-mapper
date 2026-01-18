@@ -40,5 +40,12 @@
             <tag name="dto_bundle.value_converter" priority="70"/>
         </service>
 
+        <service
+                id="ControlBit\Dto\Mapper\ValueConverter\DtoToDto"
+                class="ControlBit\Dto\Mapper\ValueConverter\DtoToDto"
+        >
+            <tag name="dto_bundle.value_converter" priority="60"/>
+        </service>
+
     </services>
 </container>
