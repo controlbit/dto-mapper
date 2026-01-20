@@ -28,17 +28,22 @@ final readonly class Mapper implements MapperInterface
     ) {
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function mapCollection(array $source, string $destination = null): array
     {
         return \array_map(fn($item) => $this->map($item, $destination), $source);
     }
 
+
+    /**
+     * {@inheritDoc}
+     */
     public function map(object|array $source, string|object|null $destination = null): object
     {
         // Preparing source object. It must be objected to.
         $source = \is_object($source) ? $source : (object)$source;
-
-        \assert(\is_object($source));
 
         // Fetching source metadata. This could be cached. But not in case of stdClass.
         $sourceMetadata = $this->objectMetadataFactory->create($source);

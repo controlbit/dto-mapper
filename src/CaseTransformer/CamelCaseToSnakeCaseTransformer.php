@@ -5,6 +5,9 @@ namespace ControlBit\Dto\CaseTransformer;
 
 use ControlBit\Dto\Contract\CaseTransformerInterface;
 
+/**
+ * @psalm-import-type AssociativeArray from \ControlBit\Dto\Contract\CaseTransformerInterface
+ */
 final class CamelCaseToSnakeCaseTransformer implements CaseTransformerInterface
 {
     /**
@@ -17,6 +20,8 @@ final class CamelCaseToSnakeCaseTransformer implements CaseTransformerInterface
         }
 
         $result = [];
+
+        /** @var AssociativeArray|string|int $value */
         foreach ($arrayOrString as $key => $value) {
             if (\is_array($value)) {
                 $value = $this->transform($value);
@@ -35,6 +40,9 @@ final class CamelCaseToSnakeCaseTransformer implements CaseTransformerInterface
 
     private function camelToSnake(string $string): string
     {
-        return \strtolower(\preg_replace('/(?<!^)[A-Z]/', '_$0', $string));
+        /** @var string $snake */
+        $snake = \preg_replace('/(?<!^)[A-Z]/', '_$0', $string);
+
+        return \strtolower($snake);
     }
 }

@@ -18,13 +18,19 @@ final readonly class ConstructedDelegate implements DestinationFactoryInterface
     ) {
     }
 
+    /**
+     * @template T of object
+     * @param  class-string<T>|null  $destination
+     *
+     * @return T|null
+     */
     public function create(
         Mapper                $mapper,
         object                $source,
         ClassMetadata         $sourceClassMetadata,
         MapMetadataCollection $mapMetadataCollection,
         ?string               $destination,
-    ): object|string|null {
+    ): object|null {
         if (null === $destination || !\class_exists($destination)) {
             return null;
         }

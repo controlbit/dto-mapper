@@ -16,7 +16,7 @@ final readonly class NonConstructedDelegate implements DestinationFactoryInterfa
         ClassMetadata         $sourceClassMetadata,
         MapMetadataCollection $mapMetadataCollection,
         ?string               $destination,
-    ): object|string|null {
+    ): object|null {
 
         if (null === $destination || !\class_exists($destination)) {
             return null;

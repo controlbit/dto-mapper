@@ -19,10 +19,14 @@ readonly class Transformer
      * @var class-string<TransformerInterface>
      */
     private string $transformerClass;
-    private array  $options;
+    /**
+     * @var array<string, mixed>
+     */
+    private array $options;
 
     /**
-     * @param  class-string  $transformerClass
+     * @param  class-string          $transformerClass
+     * @param  array<string, mixed>  $options
      */
     public function __construct(string $transformerClass, array $options = [])
     {
@@ -52,6 +56,9 @@ readonly class Transformer
         return $this->transformerClass;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getOptions(): array
     {
         return $this->options;

@@ -5,6 +5,9 @@ namespace ControlBit\Dto\CaseTransformer;
 
 use ControlBit\Dto\Contract\CaseTransformerInterface;
 
+/**
+ * @psalm-import-type AssociativeArray from \ControlBit\Dto\Contract\CaseTransformerInterface
+ */
 final class SnakeCaseToCamelCaseTransformer implements CaseTransformerInterface
 {
     /**
@@ -17,6 +20,8 @@ final class SnakeCaseToCamelCaseTransformer implements CaseTransformerInterface
         }
 
         $result = [];
+
+        /** @var AssociativeArray|string|int $value */
         foreach ($arrayOrString as $key => $value) {
             if (\is_array($value)) {
                 $value = $this->transform($value);

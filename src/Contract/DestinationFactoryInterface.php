@@ -8,6 +8,12 @@ use ControlBit\Dto\MetaData\Map\MapMetadataCollection;
 
 interface DestinationFactoryInterface
 {
+    /**
+     * @template T of object
+     * @param  class-string<T>|null  $destination
+     *
+     * @return T|class-string<T>|null
+     */
     public function create(
         Mapper                $mapper,
         object                $source,

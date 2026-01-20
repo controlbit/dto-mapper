@@ -31,10 +31,8 @@ final readonly class AlwaysStrategy implements ConstructorStrategyInterface
 {
     public const NAME = 'always';
 
-    public function __construct(
-        private ValueConverter $valueConverter,
-        private ClassMetadataFactory $objectMetadataFactory,
-    ) {
+    public function __construct(private ValueConverter $valueConverter)
+    {
     }
 
     public function validate(
@@ -85,16 +83,18 @@ final readonly class AlwaysStrategy implements ConstructorStrategyInterface
             /** @var MapMetadata $destinationMemberMetaData */
             $destinationMemberMetaData = $mapMetadata->getHavingDestinationMember($argument->getName());
             $destinationMemberMetaData->setMappedInConstructor();
-            $sourcePropertyMetadata = $sourceMetadata->getProperty($destinationMemberMetaData->getSourceMember());
 
-            // TODO: Handle From and To
-            if (null === $sourcePropertyMetadata) {
+            if (null !== $destinationMemberMetaData->getSourceMember()) {
+                $sourcePropertyMetadata = $sourceMetadata->getProperty($destinationMemberMetaData->getSourceMember());
+            }
+
+            if (!isset($sourcePropertyMetadata)) {
                 $argumentsToPass[] = $this->getArgumentValue($argument);
                 continue;
             }
 
             /** @var GetterInterface $getter */
-            $getter = $sourcePropertyMetadata?->getAccessor()->getGetter();
+            $getter = $sourcePropertyMetadata->getAccessor()->getGetter();
             $setter = new ConstructorSetter(
                 new TypeBag(TypeTool::getReflectionTypes($argument)),
                 AttributeBag::fromArray(instantiate_attributes($argument)),

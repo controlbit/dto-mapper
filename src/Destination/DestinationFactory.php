@@ -19,6 +19,12 @@ final readonly class DestinationFactory
     ) {
     }
 
+    /**
+     * @template T of object
+     * @param  class-string<T>|null  $destination
+     *
+     * @return T
+     */
     public function create(
         Mapper                $mapper,
         object                $source,
@@ -34,10 +40,6 @@ final readonly class DestinationFactory
                 $mapMetadataCollection,
                 $destination,
             );
-
-            if (\is_string($result)) {
-                $destination = $result;
-            }
 
             if (\is_object($result)) {
                 return $result;

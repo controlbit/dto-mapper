@@ -28,6 +28,9 @@ readonly final class AccessorFinder
     {
     }
 
+    /**
+     * @param  \ReflectionObject|\ReflectionClass<object>  $reflectionObject
+     */
     public function find(
         \ReflectionObject|\ReflectionClass $reflectionObject,
         \ReflectionProperty                $reflectionProperty,

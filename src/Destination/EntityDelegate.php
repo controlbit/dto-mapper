@@ -17,6 +17,12 @@ final readonly class EntityDelegate implements DestinationFactoryInterface
     public function __construct(private ?ManagerRegistry $doctrineRegistry = null) {
     }
 
+    /**
+     * @template T of object
+     * @param  class-string<T>|null  $destination
+     *
+     * @return T|class-string<T>|null
+     */
     public function create(
         Mapper                $mapper,
         object                $source,

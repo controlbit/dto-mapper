@@ -55,14 +55,18 @@ final class NeverStrategy implements ConstructorStrategyInterface
      */
     private function hasPublicMembers(\ReflectionClass $reflectionClass): bool
     {
-        $numberOfPublicProperties = \array_filter(
-            $reflectionClass->getProperties(),
-            static fn (\ReflectionProperty $property) => $property->isPublic() && !$property->isStatic()
+        $numberOfPublicProperties = \count(
+            \array_filter(
+                $reflectionClass->getProperties(),
+                static fn(\ReflectionProperty $property) => $property->isPublic() && !$property->isStatic()
+            )
         );
 
-        $numberOfPublicMethods = \array_filter(
-            $reflectionClass->getMethods(),
-            static fn (\ReflectionMethod $method) => $method->isPublic() && !$method->isStatic()
+        $numberOfPublicMethods = \count(
+            \array_filter(
+                $reflectionClass->getMethods(),
+                static fn(\ReflectionMethod $method) => $method->isPublic() && !$method->isStatic()
+            )
         );
 
         return 0 !== ($numberOfPublicProperties + $numberOfPublicMethods);

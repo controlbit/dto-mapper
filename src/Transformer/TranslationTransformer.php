@@ -24,10 +24,6 @@ final class TranslationTransformer implements TransformerInterface
             return null;
         }
 
-        if ($options['ignoreWhenMappingOnEntity']) {
-            return $value;
-        }
-
         return $this->translate($value, $options);
     }
 
@@ -37,9 +33,10 @@ final class TranslationTransformer implements TransformerInterface
      */
     public function reverse(mixed $value, array $options = []): mixed
     {
-       throw new NotImplementedException('Reverse transformation is not supported for TranslationTransformer.');
+        throw new NotImplementedException('Reverse transformation is not supported for TranslationTransformer.');
     }
 
+    
     private function translate(mixed $value, array $options): mixed
     {
         if (!\is_string($value) || null === $this->translator) {

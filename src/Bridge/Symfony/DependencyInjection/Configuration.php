@@ -14,9 +14,6 @@ final class Configuration implements ConfigurationInterface
     {
         $treeBuilder = new TreeBuilder('dto_bundle');
 
-        /**
-         * @phpstan-ignore-next-line
-         */
         $treeBuilder
             ->getRootNode()
                 ->children()
