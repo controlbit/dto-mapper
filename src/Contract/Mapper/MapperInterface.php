@@ -20,7 +20,7 @@ interface MapperInterface
 
      /**
       * @template T of object
-      * @param  array<object>          $source
+      * @param  array<mixed>          $source
       * @param  class-string<T>|null  $destination
       *
       * @return array<T>
