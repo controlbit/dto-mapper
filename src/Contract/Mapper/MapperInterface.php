@@ -20,10 +20,10 @@ interface MapperInterface
 
     /**
      * @template T of object
-     * @param  array<mixed>  $source
-     * @param  class-string  $destination
+     * @param  array<mixed>       $source
+     * @param  class-string|null  $destination
      *
      * @return array<T>
      */
-    public function mapCollection(array $source, string $destination = null): array;
+    public function mapCollection(array $source, ?string $destination = null): array;
 }
