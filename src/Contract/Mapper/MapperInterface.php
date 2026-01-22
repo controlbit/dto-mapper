@@ -18,12 +18,12 @@ interface MapperInterface
      */
     public function map(object|array $source, string|object|null $destination = null): object;
 
-     /**
-      * @template T of object
-      * @param  array<mixed>          $source
-      * @param  class-string<T>|null  $destination
-      *
-      * @return array<T>
-      */
+    /**
+     * @template T of object
+     * @param  array<mixed>  $source
+     * @param  class-string  $destination
+     *
+     * @return array<T>
+     */
     public function mapCollection(array $source, string $destination = null): array;
 }
