@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ControlBit\Dto\Attribute\Transformers;
 
 use ControlBit\Dto\Attribute\Transformer;
-use ControlBit\Dto\Transformer\FlattenArrayTransformer;
+use ControlBit\Dto\Transformer\FirstElementOfArrayTransformer;
 
 /**
  * Tells if it should be mapped as single element of given array
@@ -15,6 +15,6 @@ final readonly class FirstElementOfArray extends Transformer
 {
     public function __construct()
     {
-        parent::__construct(FlattenArrayTransformer::class);
+        parent::__construct(FirstElementOfArrayTransformer::class);
     }
 }
