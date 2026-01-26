@@ -23,6 +23,12 @@ final readonly class SetterFinder
     {
     }
 
+    /**
+     * @template T of object
+     * @param  ClassMetadata<T>  $destinationMetadata
+     *
+     * @return SetterInterface|null
+     */
     public function find(ClassMetadata $destinationMetadata, MapMetadata $memberMapMetadata): ?SetterInterface
     {
         foreach ($this->resolvers as $resolver) {

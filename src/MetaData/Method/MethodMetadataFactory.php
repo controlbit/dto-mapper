@@ -10,6 +10,11 @@ use function ControlBit\Dto\instantiate_attributes;
 
 final class MethodMetadataFactory
 {
+    /**
+     * @template T of object
+     *
+     * @param  \ReflectionObject|\ReflectionClass<T>  $subject
+     */
     public function create(\ReflectionObject|\ReflectionClass $subject, string $methodName): MethodMetadata
     {
         $reflectionMethod = $subject->getMethod($methodName);

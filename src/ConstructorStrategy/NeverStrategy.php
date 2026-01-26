@@ -17,6 +17,9 @@ final class NeverStrategy implements ConstructorStrategyInterface
     {
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function validate(
         \ReflectionClass      $destinationReflectionClass,
         MapMetadataCollection $mapMetadata,
@@ -35,6 +38,9 @@ final class NeverStrategy implements ConstructorStrategyInterface
         );
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function create(
         Mapper                $mapper,
         object                $source,

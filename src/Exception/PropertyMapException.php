@@ -11,6 +11,12 @@ use ControlBit\Dto\MetaData\Map\MapMetadata;
 
 class PropertyMapException extends \RuntimeException implements DtoExceptionInterface
 {
+    /**
+     * @template S of object
+     * @template D of object
+     * @param  ClassMetadata<S>  $sourceMetaData
+     * @param  ClassMetadata<D>  $destinationMetaData
+     */
     public function __construct(
         MapMetadata     $mapMetadata,
         ClassMetadata   $sourceMetaData,

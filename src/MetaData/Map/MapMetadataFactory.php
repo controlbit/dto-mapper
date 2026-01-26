@@ -11,6 +11,13 @@ use ControlBit\Dto\MetaData\Property\PropertyMetadata;
 
 final class MapMetadataFactory
 {
+    /**
+     * @template S of object
+     * @template D of object
+     *
+     * @param  ClassMetadata<S>  $sourceMetadata
+     * @param  ClassMetadata<D>  $destinationMetadata
+     */
     public function create(ClassMetadata $sourceMetadata, ClassMetadata $destinationMetadata): MapMetadataCollection
     {
         $mapMetadata               = new MapMetadataCollection();

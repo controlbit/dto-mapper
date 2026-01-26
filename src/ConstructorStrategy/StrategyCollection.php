@@ -23,6 +23,9 @@ readonly class StrategyCollection implements \IteratorAggregate
     {
     }
 
+    /**
+     * @return ConstructorStrategyInterface
+     */
     public function getStrategy(ConstructorStrategy $strategy): ConstructorStrategyInterface
     {
         foreach ($this as $item) {
@@ -34,6 +37,9 @@ readonly class StrategyCollection implements \IteratorAggregate
         throw new LogicException('Strategy not found.');
     }
 
+    /**
+     * @return ConstructorStrategyInterface
+     */
     public function getDefaultStrategy(): ConstructorStrategyInterface
     {
         return $this->getStrategy($this->defaultStrategy);

@@ -18,9 +18,15 @@ final readonly class ClassMetadataFactory
     ) {
     }
 
+    /**
+     * @template T of object
+     * @param  class-string<T>|T  $subject
+     *
+     * @return ClassMetadata<T>
+     */
     public function create(object|string $subject): ClassMetadata
     {
-        $reflection = is_object($subject) ? new \ReflectionObject($subject) : new \ReflectionClass($subject);
+        $reflection = \is_object($subject) ? new \ReflectionObject($subject) : new \ReflectionClass($subject);
 
         $properties = new PropertyBag();
         foreach ($reflection->getProperties() as $reflectionProperty) {
@@ -32,8 +38,11 @@ final readonly class ClassMetadataFactory
             $methods->add($this->methodMetadataFactory->create($reflection, $reflectionMethod->getName()));
         }
 
+        /** @var class-string<T> $fcqn */
+        $fcqn = $reflection->getName();
+
         return new ClassMetadata(
-            $reflection->getName(),
+            $fcqn,
             AttributeBag::fromArray(instantiate_attributes($reflection)),
             $properties,
             $methods

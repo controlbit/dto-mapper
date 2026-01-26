@@ -21,6 +21,9 @@ final class OptionalStrategy implements ConstructorStrategyInterface
     ) {
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function validate(
         \ReflectionClass      $destinationReflectionClass,
         MapMetadataCollection $mapMetadata,
@@ -39,6 +42,9 @@ final class OptionalStrategy implements ConstructorStrategyInterface
         return self::NAME;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function create(
         Mapper                $mapper,
         object                $source,

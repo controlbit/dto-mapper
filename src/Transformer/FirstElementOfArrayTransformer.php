@@ -9,8 +9,6 @@ use ControlBit\Dto\Exception\TransformerException;
 final class FirstElementOfArrayTransformer implements TransformerInterface
 {
     /**
-     * @param  array<scalar>  $value
-     * @return scalar
      * {@inheritDoc}
      */
     public function transform(mixed $value, array $options = []): mixed
@@ -27,8 +25,6 @@ final class FirstElementOfArrayTransformer implements TransformerInterface
     }
 
     /**
-     * @param  scalar  $value
-     * @return array<scalar>
      * {@inheritDoc}
      */
     public function reverse(mixed $value, array $options = []): mixed

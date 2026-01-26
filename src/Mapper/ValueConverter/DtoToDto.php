@@ -14,10 +14,6 @@ use ControlBit\Dto\Mapper\Mapper;
  */
 final class DtoToDto implements ValueConverterInterface
 {
-    public function __construct(private readonly MapperInterface $mapper)
-    {
-    }
-
     public function supports(SetterInterface $setter, mixed $value): bool
     {
         if (!\is_object($value)) {
@@ -40,6 +36,6 @@ final class DtoToDto implements ValueConverterInterface
      */
     public function execute(Mapper $mapper, SetterInterface $setter, mixed $value): mixed
     {
-        return $mapper->map($value, $setter->getType()->getOneClass());
+        return $mapper->map($value, $setter->getType()->getOneClass()); // @phpstan-ignore-line
     }
 }

@@ -9,9 +9,9 @@ use ControlBit\Dto\Exception\InvalidArgumentException;
 final class EnumTransformer implements TransformerInterface
 {
     /**
-     * @param  \BackedEnum  $value
+     * @param  mixed  $value
      *
-     * @return string|int
+     * @return string|int|null
      * {@inheritDoc}
      */
     public function transform(mixed $value, array $options = []): mixed
@@ -30,9 +30,11 @@ final class EnumTransformer implements TransformerInterface
     }
 
     /**
-     * @param  string|int  $value
+     * @template T of \BackedEnum
+     * @param  mixed  $value
+     * @param  array{class?: class-string<T>, failWhenInvalidEnumValue?: bool}  $options
      *
-     * @return \BackedEnum
+     * @return T|null
      * {@inheritDoc}
      */
     public function reverse(mixed $value, array $options = []): mixed
@@ -47,7 +49,8 @@ final class EnumTransformer implements TransformerInterface
             );
         }
 
-        $class                    = $this->getClass($options);
+        $class = $this->getClass($options);
+        /** @var null|\BackedEnum $enumValue */
         $enumValue                = ($class)::tryFrom($value);
         $failWhenInvalidEnumValue = $options['failWhenInvalidEnumValue'] ?? false;
 
@@ -64,6 +67,13 @@ final class EnumTransformer implements TransformerInterface
         return $enumValue;
     }
 
+    /**
+     * @template T
+     *
+     * @param  array{class?: class-string<T>}  $options
+     *
+     * @return class-string<T>
+     */
     private function getClass(array $options): string
     {
         $class = $options['class'] ?? null;

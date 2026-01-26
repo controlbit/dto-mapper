@@ -82,9 +82,20 @@ final readonly class Mapper implements MapperInterface
 
         Initializer::autoInitialize($destination, $destinationMetadata);
 
-        return $destination;
+        return $destination; // @phpstan-ignore-line
     }
 
+    /**
+     * @template S of object
+     * @template D of object
+     *
+     * @param  S                 $source
+     * @param  D                 $destination
+     * @param  ClassMetadata<S>  $sourceMetadata
+     * @param  ClassMetadata<D>  $destinationMetadata
+     *
+     * @return D
+     */
     private function execute(
         object                $source,
         object                $destination,
@@ -104,7 +115,7 @@ final readonly class Mapper implements MapperInterface
             }
 
             $sourceReflection = new \ReflectionObject($source);
-            $getter = $this->accessorFinder->findGetter($sourceReflection, $mapMetadata);
+            $getter           = $this->accessorFinder->findGetter($sourceReflection, $mapMetadata);
 
             if (null === $getter) {
                 continue;
@@ -116,7 +127,8 @@ final readonly class Mapper implements MapperInterface
             try {
                 $setter->set($destination, $value);
             } catch (\Throwable $e) {
-                throw new PropertyMapException($mapMetadata, $sourceMetadata, $destinationMetadata, $setter, $getter, $e);
+                throw new PropertyMapException($mapMetadata, $sourceMetadata, $destinationMetadata, $setter, $getter,
+                                               $e);
             }
         }
 

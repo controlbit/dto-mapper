@@ -37,6 +37,7 @@ final readonly class ConstructedDelegate implements DestinationFactoryInterface
 
         /** @var ?Dto $dtoAttribute */
         $dtoAttribute          = $sourceClassMetadata->getAttributes()->get(Dto::class);
+        /** @var \ReflectionClass<T> $destinationReflection */
         $destinationReflection = new \ReflectionClass($destination);
         $constructorStrategy   = $this->getConstructorStrategy($dtoAttribute);
 

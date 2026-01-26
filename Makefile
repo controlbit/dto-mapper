@@ -12,7 +12,7 @@ DOCKER_RUN_COMMAND = docker exec -it ${PHP_CONTAINER_NAME}
 PHPUNIT = ./vendor/bin/phpunit -c ./phpunit.xml.dist
 COV_CHECK = ./vendor/bin/coverage-check .analysis/phpunit/coverage/coverage.xml 75
 INFECTION = ./vendor/bin/infection  --threads=1 --only-covered --skip-initial-tests --coverage=.analysis/phpunit/coverage
-PHP_STAN = ./vendor/bin/phpstan
+PHP_STAN = ./vendor/bin/phpstan --memory-limit=1G
 PHP_MD = ./vendor/bin/phpmd src/ text phpmd_ruleset.xml
 
 setup:

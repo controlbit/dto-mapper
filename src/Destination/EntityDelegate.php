@@ -14,7 +14,8 @@ use Doctrine\Persistence\ManagerRegistry;
 
 final readonly class EntityDelegate implements DestinationFactoryInterface
 {
-    public function __construct(private ?ManagerRegistry $doctrineRegistry = null) {
+    public function __construct(private ?ManagerRegistry $doctrineRegistry = null)
+    {
     }
 
     /**
@@ -42,10 +43,10 @@ final readonly class EntityDelegate implements DestinationFactoryInterface
         $identifier = $sourceClassMetadata->getIdentifierProperty()?->getAccessor()->get($source);
 
         if (null !== $this->doctrineRegistry && null !== $identifier && null !== $entityClass) {
-            return $this->fetchEntity($entityClass, $identifier);
+            return $this->fetchEntity($entityClass, $identifier); // @phpstan-ignore-line
         }
 
-        return $entityClass;
+        return $entityClass; // @phpstan-ignore-line
     }
 
     private function supports(?string $entityClass): bool

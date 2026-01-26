@@ -26,6 +26,6 @@ final class ArrayToObject implements ValueConverterInterface
      */
     public function execute(Mapper $mapper, SetterInterface $setter, mixed $value): mixed
     {
-        return $mapper->map($value, $setter->getType()->getOneClass());
+        return $mapper->map($value, $setter->getType()->getOneClass()); // @phpstan-ignore-line
     }
 }

@@ -10,7 +10,8 @@ use ControlBit\Dto\MetaData\Map\MapMetadataCollection;
 interface ConstructorStrategyInterface
 {
     /**
-     * @param  \ReflectionClass<object>  $destinationReflectionClass
+     * @template T of object
+     * @param  \ReflectionClass<T>  $destinationReflectionClass
      */
     public function validate(
         \ReflectionClass      $destinationReflectionClass,
@@ -18,7 +19,12 @@ interface ConstructorStrategyInterface
     ): void;
 
     /**
-     * @param  \ReflectionClass<object>  $destinationReflectionClass
+     * @template S of object
+     * @template D of object
+     * @param  \ReflectionClass<D>  $destinationReflectionClass
+     * @param ClassMetadata<S> $sourceMetadata
+     *
+     * @return D
      */
     public function create(
         Mapper                $mapper,

@@ -27,6 +27,12 @@ final readonly class ValueConverter
     ) {
     }
 
+    /**
+     * @template S of object
+     * @param  ClassMetadata<S>  $sourceMetadata
+     *
+     * @return mixed
+     */
     public function map(
         Mapper          $mapper,
         ClassMetadata   $sourceMetadata,
@@ -55,6 +61,12 @@ final readonly class ValueConverter
         return $value;
     }
 
+    /**
+     * @template S of object
+     *
+     * @param  ClassMetadata<S>        $sourceMetadata
+     * @param  TransformableInterface  $transformable
+     */
     private function transform(
         mixed                  $value,
         ClassMetadata          $sourceMetadata,
@@ -70,7 +82,7 @@ final readonly class ValueConverter
         foreach ($transformerAttributes as $attribute) {
             $classOrId           = $attribute->getTransformerIdOrClass();
             $options             = $attribute->getOptions();
-            $transformerInstance = $this->instantiateTransformer($classOrId); // @phpstan-ignore-line
+            $transformerInstance = $this->instantiateTransformer($classOrId);
             $isReverseTransform  = $this->shouldReverseTransform($attribute, $sourceMetadata, $isSourceTransformerOnly);
 
             $value = $isReverseTransform
@@ -127,10 +139,13 @@ final readonly class ValueConverter
         );
     }
 
-    private function shouldFollowSourceTransformerOnly(
-        ClassMetadata   $sourceMetadata,
-        GetterInterface $getter,
-    ): bool {
+    /**
+     * @template S of object
+     *
+     * @param  ClassMetadata<S>  $sourceMetadata
+     */
+    private function shouldFollowSourceTransformerOnly(ClassMetadata $sourceMetadata, GetterInterface $getter): bool
+    {
         if (!$sourceMetadata->getAttributes()->has(Entity::class)) {
             return false;
         }
@@ -144,6 +159,10 @@ final readonly class ValueConverter
         return $getter->getAttributes()->has(From::class);
     }
 
+    /**
+     * @template S of object
+     * @param  ClassMetadata<S>  $sourceMetadata
+     */
     private function shouldReverseTransform(
         Transformer   $transformerAttribute,
         ClassMetadata $sourceMetadata,

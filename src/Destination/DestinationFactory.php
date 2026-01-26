@@ -14,16 +14,18 @@ final readonly class DestinationFactory
     /**
      * @param  iterable<DestinationFactoryInterface>  $delegates
      */
-    public function __construct(
-        private iterable $delegates
-    ) {
+    public function __construct(private iterable $delegates)
+    {
     }
 
     /**
-     * @template T of object
-     * @param  class-string<T>|null  $destination
+     * @template D of object
+     * @template S of object
+     * @param  S                     $source
+     * @param  class-string<D>|null  $destination
+     * @param  ClassMetadata<S>      $sourceClassMetadata
      *
-     * @return T
+     * @return D
      */
     public function create(
         Mapper                $mapper,
