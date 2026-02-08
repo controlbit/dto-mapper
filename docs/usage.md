@@ -81,7 +81,8 @@ class Dto {
     private int $baz;
     private ?Dto $nested;
     
-    #[ControlBit\Dto\Attribute\Dto(Dto::class)] /* In this case, we know it's */
+    /* We explain that array elements are DTOs of this class */
+    #[ControlBit\Dto\Attribute\Dto(Dto::class)] 
     private array $arrayOfFoo;
 }
 
@@ -97,7 +98,7 @@ class Dto {
     private int $baz;
 }
 
-$source = new Dto(/* This is where you populate tour DTO */);
+$source = new Dto(/* some args */);
 
 class Foo {
     private int $bar;
@@ -117,7 +118,7 @@ and calling just:
 This is useful if you want to constrain your DTO to be mapped only to certain type of object.
 
 ### From Object to DTO
-Similar to previous one, but reversed. Also, let's make it litle more complex:
+Similar to the previous one, but reversed. Also, let's make it litle more complex:
 ```php
 
 class Foo {
@@ -127,13 +128,14 @@ class Foo {
     private array $arrayOfFoo;
 }
 
-$source = new Foo(/* let's assume you populated with data you want */);
+$source = new Foo(/* some args */);
 
 class Dto {
     private int $bar;
     private int $baz;
     private Dto $nested;
     
+    /* We explain that array elements are DTOs of this class */
     #[ControlBit\Dto\Attribute\Dto(Dto::class)]
     private array $arrayOfFoo;
 }
@@ -402,8 +404,8 @@ You can customize this behavior using the `constructorStrategy` parameter of the
 
 The following strategies are available via the `ControlBit\Dto\Enum\ConstructorStrategy` enum:
 
-| Strategy | Description                                                                                                                                                           |
-| :--- |:----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `OPTIONAL` | **(Default)** Will use constructor for properties which are available to set via constructor. For others, it will map directly to props.                              
-| `ALWAYS` | Will always use the constructor. If any required constructor argument is missing in the source, a `ControlBit\Dto\Exception\MissingArgumentException` will be thrown. |
-| `NEVER` | Will never use the constructor. The object will be instantiated without calling the constructor (using reflection only), and properties will be mapped directly.     |
+| Strategy   | Description                                                                                                                                                           |
+|:-----------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `OPTIONAL` | **(Default)** Will use constructor for properties which are available to set via constructor. For others, it will map directly to props.                              |
+| `ALWAYS`   | Will always use the constructor. If any required constructor argument is missing in the source, a `ControlBit\Dto\Exception\MissingArgumentException` will be thrown. |
+| `NEVER`    | Will never use the constructor. The object will be instantiated without calling the constructor (using reflection only), and properties will be mapped directly.      |

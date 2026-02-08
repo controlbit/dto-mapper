@@ -1,14 +1,5 @@
 # DTO Mapper
 
-A DTO Mapper library and Symfony bundle
-
-- [Quick guide](#quick-guide)
-    - [Requirements](#requirements)
-    - [Using Composer](#using-composer)
-- [For Symfony users](#for-symfony-users)
-- [Documentation](#documentation)
-- [TODO (Upcoming)](#todo-upcoming)
-
 ## Quick setup
 ```bash
 composer require controlbit/dto-mapper
@@ -33,3 +24,5 @@ Next, read [Usage](docs/usage.md) and you're good!
 ## TODO (Upcoming):
 - Mapping UploadedFile into \SplFileInfo (could be that half of it is working already)
 - Caching Mapping Metadata
+- Improve error messages
+- Imrove `From` attribute with support for nested objects. ex From('foo.bar.baz')
