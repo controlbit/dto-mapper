@@ -15,6 +15,12 @@
         - [Stacking transformers](#stacking-transformers)
         - [Built-in transformers](#built-in-transformers)
     - [Request to DTO](#request-to-dto)
+    - [Mapping to Doctrine Entity](#mapping-to-doctrine-entity)
+        - [Updating an existing entity](#updating-an-existing-entity)
+        - [Creating a new entity](#creating-a-new-entity)
+        - [Important notes](#important-notes)
+    - [Constructor strategy](#constructor-strategy)
+        - [Available Strategies](#available-strategies)
 
 ## Getting Mapper instance
 
@@ -386,3 +392,18 @@ $product = $mapper->map($dto);
 - If you use DTO Mapper as a Symfony bundle and have `doctrine/orm` installed, the `EntityManager` will be automatically used to fetch entities.
 - If an entity with the given identifier is not found, a `ControlBit\Dto\Exception\EntityNotFoundException` will be thrown.
 
+### Constructor strategy
+
+The DTO Mapper uses different strategies to instantiate your objects. By default, it uses the `OPTIONAL` constructor strategy.
+
+You can customize this behavior using the `constructorStrategy` parameter of the `#[Dto]` attribute on your DTO class, or globally when creating the mapper.
+
+#### Available Strategies
+
+The following strategies are available via the `ControlBit\Dto\Enum\ConstructorStrategy` enum:
+
+| Strategy | Description                                                                                                                                                           |
+| :--- |:----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `OPTIONAL` | **(Default)** Will use constructor for properties which are available to set via constructor. For others, it will map directly to props.                              
+| `ALWAYS` | Will always use the constructor. If any required constructor argument is missing in the source, a `ControlBit\Dto\Exception\MissingArgumentException` will be thrown. |
+| `NEVER` | Will never use the constructor. The object will be instantiated without calling the constructor (using reflection only), and properties will be mapped directly.     |
