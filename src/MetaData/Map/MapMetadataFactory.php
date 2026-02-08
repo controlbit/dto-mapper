@@ -3,72 +3,84 @@ declare(strict_types=1);
 
 namespace ControlBit\Dto\MetaData\Map;
 
-use ControlBit\Dto\Attribute\MapFrom;
-use ControlBit\Dto\Attribute\MapTo;
-use ControlBit\Dto\Attribute\Transformer;
+use ControlBit\Dto\Attribute\From;
+use ControlBit\Dto\Attribute\To;
 use ControlBit\Dto\Bag\AttributeBag;
 use ControlBit\Dto\MetaData\Class\ClassMetadata;
 use ControlBit\Dto\MetaData\Property\PropertyMetadata;
 
 final class MapMetadataFactory
 {
-    public function create(ClassMetadata $classMetadata): MapMetadataCollection
+    /**
+     * @template S of object
+     * @template D of object
+     *
+     * @param  ClassMetadata<S>  $sourceMetadata
+     * @param  ClassMetadata<D>  $destinationMetadata
+     */
+    public function create(ClassMetadata $sourceMetadata, ClassMetadata $destinationMetadata): MapMetadataCollection
     {
-        $mapMetadata = new MapMetadataCollection();
+        $mapMetadata               = new MapMetadataCollection();
+        $visitedDestinationMembers = [];
 
-        foreach ($classMetadata->getProperties() as $propertyMetadata) {
+        foreach ($sourceMetadata->getProperties() as $propertyMetadata) {
             $attributes = $propertyMetadata->getAttributes();
 
-            $memberMetadata = match (true) {
-                $attributes->has(MapTo::class)   => $this->mapTo($propertyMetadata, $attributes),
-                $attributes->has(MapFrom::class) => $this->mapFrom($propertyMetadata, $attributes),
-                default                          => new MemberMapMetadata(
-                    $propertyMetadata->getName(),
-                    $propertyMetadata->getName(),
-                    $this->getTransformer($propertyMetadata)
-                ),
-            };
+            if (!$attributes->has(To::class)) {
+                continue;
+            }
 
-            $mapMetadata->add($memberMetadata);
+            $to     = $attributes->get(To::class);
+            $member = $to?->getMember();
+
+            if (\in_array($member, $visitedDestinationMembers, true)) {
+                continue;
+            }
+
+            $visitedDestinationMembers[] = $member;
+            $mapMetadata->add($this->mapTo($propertyMetadata, $attributes));
+        }
+
+        foreach ($destinationMetadata->getProperties() as $propertyMetadata) {
+            $attributes = $propertyMetadata->getAttributes();
+            $member     = $propertyMetadata->getName();
+
+            if (\in_array($member, $visitedDestinationMembers, true)) {
+                continue;
+            }
+
+            $mapMetadata->add(match (true) {
+                $attributes->has(From::class) => $this->mapFrom($propertyMetadata, $attributes),
+                default                       => new MapMetadata($member, null, $member, null),
+            });
         }
 
         return $mapMetadata;
     }
 
-    private function mapTo(PropertyMetadata $propertyMetadata, AttributeBag $attributes): MemberMapMetadata
+    private function mapTo(PropertyMetadata $propertyMetadata, AttributeBag $attributes): MapMetadata
     {
-        /** @var MapTo $attribute */
-        $attribute = $attributes->get(MapTo::class);
+        /** @var To $attribute */
+        $attribute = $attributes->get(To::class);
 
-        return new MemberMapMetadata(
+        return new MapMetadata(
             $propertyMetadata->getName(),
+            null,
             $attribute->getMember(),
-            $this->getTransformer($propertyMetadata),
+            $attribute->getSetter(),
         );
     }
 
-    private function mapFrom(PropertyMetadata $propertyMetadata, AttributeBag $attributes): MemberMapMetadata
+    private function mapFrom(PropertyMetadata $propertyMetadata, AttributeBag $attributes): MapMetadata
     {
-        /** @var MapFrom $attribute */
-        $attribute = $attributes->get(MapFrom::class);
+        /** @var From $attribute */
+        $attribute = $attributes->get(From::class);
 
-        return new MemberMapMetadata(
-            $propertyMetadata->getName(),
+        return new MapMetadata(
             $attribute->getMember(),
-            $this->getTransformer($propertyMetadata),
+            $attribute->getGetter(),
+            $propertyMetadata->getName(),
+            null,
         );
-    }
-
-    private function getTransformer(PropertyMetadata $propertyMetadata): ?string
-    {
-        foreach ($propertyMetadata->getAttributes() as $attribute) {
-            if (!is_a($attribute, Transformer::class, true)) {
-                continue;
-            }
-
-            return $attribute->getTransformerIdOrClass();
-        }
-
-        return null;
     }
 }

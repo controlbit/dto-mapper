@@ -5,15 +5,24 @@ namespace ControlBit\Dto\CaseTransformer;
 
 use ControlBit\Dto\Contract\CaseTransformerInterface;
 
+/**
+ * @psalm-import-type AssociativeArray from \ControlBit\Dto\Contract\CaseTransformerInterface
+ */
 final class SnakeCaseToCamelCaseTransformer implements CaseTransformerInterface
 {
     /**
      * {@inheritDoc}
      */
-    public function transform(array $array): array
+    public function transform(array|string $arrayOrString): array|string
     {
+        if (\is_string($arrayOrString)) {
+            return $this->snakeToCamel($arrayOrString);
+        }
+
         $result = [];
-        foreach ($array as $key => $value) {
+
+        /** @var AssociativeArray|string|int $value */
+        foreach ($arrayOrString as $key => $value) {
             if (\is_array($value)) {
                 $value = $this->transform($value);
             }

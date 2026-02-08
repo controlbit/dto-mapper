@@ -17,6 +17,13 @@ final class Initializer
         // noop
     }
 
+    /**
+     * @template T of object
+     * @param  T                 $object
+     * @param  ClassMetadata<T>  $objectMetadata
+     *
+     * @return void
+     */
     public static function autoInitialize(object $object, ClassMetadata $objectMetadata): void
     {
         foreach ($objectMetadata->getProperties() as $propertyMetadata) {

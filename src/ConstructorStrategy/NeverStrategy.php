@@ -17,9 +17,12 @@ final class NeverStrategy implements ConstructorStrategyInterface
     {
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function validate(
         \ReflectionClass      $destinationReflectionClass,
-        MapMetadataCollection $sourceMapMetadataCollection,
+        MapMetadataCollection $mapMetadata,
     ): void {
 
         if ($this->mapPrivateProperties) {
@@ -35,14 +38,17 @@ final class NeverStrategy implements ConstructorStrategyInterface
         );
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function create(
         Mapper                $mapper,
         object                $source,
         ClassMetadata         $sourceMetadata,
-        MapMetadataCollection $sourceMapMetadataCollection,
-        \ReflectionClass      $reflectionClass,
+        MapMetadataCollection $mapMetadata,
+        \ReflectionClass      $destinationReflectionClass,
     ): object {
-        return $reflectionClass->newInstanceWithoutConstructor();
+        return $destinationReflectionClass->newInstanceWithoutConstructor();
     }
 
     public function getName(): string
@@ -55,14 +61,18 @@ final class NeverStrategy implements ConstructorStrategyInterface
      */
     private function hasPublicMembers(\ReflectionClass $reflectionClass): bool
     {
-        $numberOfPublicProperties = \array_filter(
-            $reflectionClass->getProperties(),
-            static fn (\ReflectionProperty $property) => $property->isPublic() && !$property->isStatic()
+        $numberOfPublicProperties = \count(
+            \array_filter(
+                $reflectionClass->getProperties(),
+                static fn(\ReflectionProperty $property) => $property->isPublic() && !$property->isStatic()
+            )
         );
 
-        $numberOfPublicMethods = \array_filter(
-            $reflectionClass->getMethods(),
-            static fn (\ReflectionMethod $method) => $method->isPublic() && !$method->isStatic()
+        $numberOfPublicMethods = \count(
+            \array_filter(
+                $reflectionClass->getMethods(),
+                static fn(\ReflectionMethod $method) => $method->isPublic() && !$method->isStatic()
+            )
         );
 
         return 0 !== ($numberOfPublicProperties + $numberOfPublicMethods);

@@ -6,7 +6,7 @@ namespace ControlBit\Dto\Finder;
 use ControlBit\Dto\Contract\Accessor\SetterInterface;
 use ControlBit\Dto\Contract\Mapper\SetterResolverInterface;
 use ControlBit\Dto\MetaData\Class\ClassMetadata;
-use ControlBit\Dto\MetaData\Map\MemberMapMetadata;
+use ControlBit\Dto\MetaData\Map\MapMetadata;
 use ControlBit\Dto\MetaData\Property\PropertyMetadata;
 
 /**
@@ -23,7 +23,13 @@ final readonly class SetterFinder
     {
     }
 
-    public function find(ClassMetadata $destinationMetadata, MemberMapMetadata $memberMapMetadata): ?SetterInterface
+    /**
+     * @template T of object
+     * @param  ClassMetadata<T>  $destinationMetadata
+     *
+     * @return SetterInterface|null
+     */
+    public function find(ClassMetadata $destinationMetadata, MapMetadata $memberMapMetadata): ?SetterInterface
     {
         foreach ($this->resolvers as $resolver) {
             $setter = $resolver->resolve($destinationMetadata, $memberMapMetadata);

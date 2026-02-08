@@ -33,7 +33,10 @@ readonly class DtoArgumentResolver implements ValueResolverInterface
             return [];
         }
 
-        $dto = $this->mapper->map($this->requestToArray($request, $argument), $argument->getType());
+        /** @var class-string $destinationClass */
+        $destinationClass = $argument->getType();
+
+        $dto = $this->mapper->map($this->requestToArray($request, $argument), $destinationClass);
 
         $this->validate($dto);
 
@@ -48,8 +51,10 @@ readonly class DtoArgumentResolver implements ValueResolverInterface
             return false;
         }
 
-        if (null === find_attribute($type,
-                                    Dto::class) && \count($argument->getAttributesOfType(RequestDto::class)) === 0) {
+        if (
+            null === find_attribute($type, Dto::class) &&
+            \count($argument->getAttributesOfType(RequestDto::class)) === 0
+        ) {
             return false;
         }
 
@@ -70,7 +75,7 @@ readonly class DtoArgumentResolver implements ValueResolverInterface
     }
 
     /**
-     * @return array<mixed>
+     * @return array<string, mixed>
      */
     private function requestToArray(Request $request, ArgumentMetadata $argument): array
     {
@@ -85,6 +90,12 @@ readonly class DtoArgumentResolver implements ValueResolverInterface
         $files       = $requestDto->hasPart(RequestPart::FILES) ? $request->files : [];
         $queryParams = $requestDto->hasPart(RequestPart::QUERY) ? $request->query : [];
 
-        return $this->caseTransformer->transform([...$requestData, ...$files, ...$queryParams]);
+        /** @var array<string, mixed> $args */
+        $args = [...$requestData, ...$files, ...$queryParams];
+
+        /** @var array<string, mixed> $data */
+        $data = $this->caseTransformer->transform($args);
+
+        return $data;
     }
 }

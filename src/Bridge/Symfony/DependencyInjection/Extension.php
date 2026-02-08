@@ -20,12 +20,19 @@ class Extension extends SymfonyExtension
     public function load(array $configs, ContainerBuilder $container): void
     {
         $configuration = new Configuration();
-        $config        = $this->processConfiguration($configuration, $configs);
+        /** @var array{
+         *     constructor_strategy: string,
+         *     validation_json_bad_request: bool,
+         *     map_private_properties: bool,
+         *     case_transformer: class-string
+         * } $config
+         */
+        $config = $this->processConfiguration($configuration, $configs);
 
         if (null === ConstructorStrategy::tryFrom($config['constructor_strategy'])) {
             throw new InvalidConfigurationException(
                 \sprintf("Constructor Strategy invalid. Can be: %s",
-                         implode(ConstructorStrategy::all()))
+                         \implode(',', ConstructorStrategy::all()))
             );
         }
 
@@ -45,5 +52,6 @@ class Extension extends SymfonyExtension
         $loader->load('value_converter.xml');
         $loader->load('mapper.xml');
         $loader->load('event_listener.xml');
+        $loader->load('transformer.xml');
     }
 }

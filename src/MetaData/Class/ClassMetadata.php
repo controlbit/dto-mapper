@@ -10,11 +10,17 @@ use ControlBit\Dto\Bag\PropertyBag;
 use ControlBit\Dto\Contract\AttributedInterface;
 use ControlBit\Dto\MetaData\Method\MethodMetadata;
 use ControlBit\Dto\MetaData\Property\PropertyMetadata;
-use Doctrine\ORM\Mapping\Entity;
 
+/**
+ * @template T of object
+ */
 final readonly class ClassMetadata implements AttributedInterface
 {
     public function __construct(
+
+        /**
+         * @var class-string<T>
+         */
         private string       $fqcn,
         private AttributeBag $attributes,
         private PropertyBag  $properties,
@@ -22,6 +28,9 @@ final readonly class ClassMetadata implements AttributedInterface
     ) {
     }
 
+    /**
+     * @return class-string<T>
+     */
     public function getFqcn(): string
     {
         return $this->fqcn;
@@ -45,11 +54,6 @@ final readonly class ClassMetadata implements AttributedInterface
     public function getAttributes(): AttributeBag
     {
         return $this->attributes;
-    }
-
-    public function isDoctrineEntity(): bool
-    {
-        return $this->attributes->has(Entity::class);
     }
 
     public function getIdentifierProperty(): ?PropertyMetadata

@@ -16,7 +16,7 @@ function find_attribute(mixed $subject, string $attributeClass): ?object
         $subject = new \ReflectionClass($subject);
     }
 
-    if (\is_object($subject) && !$subject instanceof \Reflector) {
+    if (!$subject instanceof \Reflector) {
         $subject = new \ReflectionObject($subject);
     }
 
@@ -35,10 +35,13 @@ function find_attribute(mixed $subject, string $attributeClass): ?object
 }
 
 /**
+ * @template T of object
+ * @param  \ReflectionProperty|\ReflectionMethod|\ReflectionObject|\ReflectionClass<T>|\ReflectionParameter  $reflection
+ *
  * @return object[]
  */
 function instantiate_attributes(
-    \ReflectionProperty|\ReflectionMethod|\ReflectionObject|\ReflectionParameter $reflection,
+    \ReflectionProperty|\ReflectionMethod|\ReflectionObject|\ReflectionClass|\ReflectionParameter $reflection,
 ): array {
     return \array_map(static function (\ReflectionAttribute $reflectionAttribute) {
         return $reflectionAttribute->newInstance();

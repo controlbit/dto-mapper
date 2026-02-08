@@ -55,6 +55,9 @@ final class SymfonyTestKernel extends Kernel
                 'validation'            => [
                     'email_validation_mode' => 'html5',
                 ],
+                'translator'            => [
+                    'default_path' => __DIR__ . '/translations',
+                ],
             ]
         );
 
@@ -115,6 +118,10 @@ final class SymfonyTestKernel extends Kernel
         $routes
             ->add('dto_asserted', '/dto/asserted')
             ->controller(DtoController::class.'::asserted')
+        ;
+        $routes
+            ->add('dto_path', '/dto/path/{foo}')
+            ->controller(DtoController::class.'::path')
         ;
     }
 }

@@ -4,6 +4,8 @@ parameters:
         - var/*
     paths:
         - src
+    ignoreErrors:
+        - '#PHPMD#'
 
 includes:
     - vendor/phpstan/phpstan-phpunit/rules.neon

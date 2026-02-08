@@ -35,6 +35,6 @@ enum ConstructorStrategy: string
      */
     public static function all(): array
     {
-        return \array_values(\array_map(static fn($case) => $case->value, self::cases()));
+        return \array_map(static fn($case) => $case->value, self::cases());
     }
 }

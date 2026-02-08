@@ -3,13 +3,17 @@ declare(strict_types=1);
 
 namespace ControlBit\Dto\Mapper;
 
+use ControlBit\Dto\Attribute\Dto;
+use ControlBit\Dto\Attribute\From;
+use ControlBit\Dto\Attribute\Transformer;
+use ControlBit\Dto\Contract\Accessor\GetterInterface;
 use ControlBit\Dto\Contract\Accessor\SetterInterface;
 use ControlBit\Dto\Contract\Mapper\ValueConverterInterface;
 use ControlBit\Dto\Contract\Transformer\TransformableInterface;
 use ControlBit\Dto\Contract\Transformer\TransformerInterface;
 use ControlBit\Dto\Exception\InvalidArgumentException;
 use ControlBit\Dto\MetaData\Class\ClassMetadata;
-use ControlBit\Dto\MetaData\Map\MemberMapMetadata;
+use Doctrine\ORM\Mapping\Entity;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 final readonly class ValueConverter
@@ -23,14 +27,28 @@ final readonly class ValueConverter
     ) {
     }
 
+    /**
+     * @template S of object
+     * @param  ClassMetadata<S>  $sourceMetadata
+     *
+     * @return mixed
+     */
     public function map(
-        Mapper            $mapper,
-        ClassMetadata     $sourceMetadata,
-        SetterInterface   $setter,
-        MemberMapMetadata $memberMapMetadata,
-        mixed             $value,
+        Mapper          $mapper,
+        ClassMetadata   $sourceMetadata,
+        GetterInterface $getter,
+        SetterInterface $setter,
+        mixed           $value,
     ): mixed {
-        $value = $this->transform($value, $sourceMetadata, $memberMapMetadata);
+        $isSourceTransformerOnly = $this->shouldFollowSourceTransformerOnly($sourceMetadata, $getter);
+
+        if ($getter instanceof TransformableInterface && $isSourceTransformerOnly) {
+            $value = $this->transform($value, $sourceMetadata, $getter, true);
+        }
+
+        if ($setter instanceof TransformableInterface && !$isSourceTransformerOnly) {
+            $value = $this->transform($value, $sourceMetadata, $setter, false);
+        }
 
         foreach ($this->valueConverters as $valueConverter) {
             if (!$valueConverter->supports($setter, $value)) {
@@ -40,39 +58,48 @@ final readonly class ValueConverter
             $value = $valueConverter->execute($mapper, $setter, $value);
         }
 
-        if ($setter instanceof TransformableInterface) {
-            $value = $this->transform($value, $sourceMetadata, $setter);
+        return $value;
+    }
+
+    /**
+     * @template S of object
+     *
+     * @param  ClassMetadata<S>        $sourceMetadata
+     * @param  TransformableInterface  $transformable
+     */
+    private function transform(
+        mixed                  $value,
+        ClassMetadata          $sourceMetadata,
+        TransformableInterface $transformable,
+        bool                   $isSourceTransformerOnly,
+    ): mixed {
+        if (!$transformable->hasTransformersAttributes()) {
+            return $value;
+        }
+
+        $transformerAttributes = $transformable->getTransformerAttributes();
+
+        foreach ($transformerAttributes as $attribute) {
+            $classOrId           = $attribute->getTransformerIdOrClass();
+            $options             = $attribute->getOptions();
+            $transformerInstance = $this->instantiateTransformer($classOrId);
+            $isReverseTransform  = $this->shouldReverseTransform($attribute, $sourceMetadata, $isSourceTransformerOnly);
+
+            $value = $isReverseTransform
+                ? $transformerInstance->reverse($value, $options)
+                : $transformerInstance->transform($value, $options);
         }
 
         return $value;
     }
 
-    private function transform(
-        mixed                  $value,
-        ClassMetadata          $sourceMetadata,
-        TransformableInterface $transformable,
-    ): mixed {
-        if (!$transformable->hasTransformer()) {
-            return $value;
-        }
-
-        $transformerClassOrId = $transformable->getTransformerClassOrId();
-        $transformer          = $this->instantiateTransformer($transformerClassOrId); // @phpstan-ignore-line
-
-        if ($sourceMetadata->isDoctrineEntity()) {
-            return $transformer->reverse($value);
-        }
-
-        return $transformer->transform($value);
-    }
-
     /**
-     * @param  string|class-string  $transformerClassOrId
+     * @param  string|class-string  $classOrId
      */
-    private function instantiateTransformer(string $transformerClassOrId): TransformerInterface
+    private function instantiateTransformer(string $classOrId): TransformerInterface
     {
-        if (null !== $this->container) {
-            $transformerService = $this->container->get($transformerClassOrId);
+        if (null !== $this->container && $this->container->has($classOrId)) {
+            $transformerService = $this->container->get($classOrId);
         }
 
         if (isset($transformerService)) {
@@ -82,10 +109,10 @@ final readonly class ValueConverter
             return $transformerService;
         }
 
-        $this->validateTransformer($transformerClassOrId);
+        $this->validateTransformer($classOrId);
 
         /* @phpstan-ignore-next-line */
-        return (new \ReflectionClass($transformerClassOrId))->newInstanceWithoutConstructor();
+        return (new \ReflectionClass($classOrId))->newInstanceWithoutConstructor();
     }
 
     private function validateTransformer(object|string $transformerClassOrObject): void
@@ -110,5 +137,55 @@ final readonly class ValueConverter
                 TransformerInterface::class,
             )
         );
+    }
+
+    /**
+     * @template S of object
+     *
+     * @param  ClassMetadata<S>  $sourceMetadata
+     */
+    private function shouldFollowSourceTransformerOnly(ClassMetadata $sourceMetadata, GetterInterface $getter): bool
+    {
+        if (!$sourceMetadata->getAttributes()->has(Entity::class)) {
+            return false;
+        }
+
+        if ($sourceMetadata->getAttributes()->has(Dto::class)) {
+            if (null !== $sourceMetadata->getAttributes()->get(Dto::class)?->getEntityClass()) {
+                return true;
+            }
+        }
+
+        return $getter->getAttributes()->has(From::class);
+    }
+
+    /**
+     * @template S of object
+     * @param  ClassMetadata<S>  $sourceMetadata
+     */
+    private function shouldReverseTransform(
+        Transformer   $transformerAttribute,
+        ClassMetadata $sourceMetadata,
+        bool          $isSourceAttributesOnly,
+    ): bool {
+        $reverseOption = $transformerAttribute->getOptions()['reverse'] ?? null;
+
+        if (true === $reverseOption) {
+            return true;
+        }
+
+        if (false === $reverseOption) {
+            return false;
+        }
+
+        if (!$isSourceAttributesOnly) {
+            return false;
+        }
+
+        if ($sourceMetadata->getFqcn() !== \stdClass::class) {
+            return false;
+        }
+
+        return true;
     }
 }

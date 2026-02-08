@@ -8,4 +8,4 @@ phpunit.xml
 .analysis
 
 # Composer PHAR & lock
-./composer.lock
+.composer.lock

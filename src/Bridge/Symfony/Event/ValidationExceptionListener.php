@@ -28,7 +28,7 @@ final class ValidationExceptionListener
 
         $request     = $event->getRequest();
         $contentType = $request->headers->get('content-type');
-        $format      = $request->attributes->get('_route_params')['_format'] ?? null;
+        $format      = $request->attributes->get('_route_params')['_format'] ?? null; // @phpstan-ignore-line
 
         if ($format !== 'json' && \strtolower((string)$contentType) !== 'application/json') {
             return;

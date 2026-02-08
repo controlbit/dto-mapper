@@ -10,11 +10,11 @@ class FirstElementOfArrayTest extends LibraryTestCase
     public function testMappingObjectWithScalarToArrayOfOne(): void
     {
         $from = new class() {
-            #[FirstElementOfArray]
             public array $foo = ['baz', 'qux', 'fruit'];
         };
 
         $to = new class() {
+            #[FirstElementOfArray]
             public string $foo;
         };
 

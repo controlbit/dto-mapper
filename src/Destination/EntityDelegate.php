@@ -14,14 +14,21 @@ use Doctrine\Persistence\ManagerRegistry;
 
 final readonly class EntityDelegate implements DestinationFactoryInterface
 {
-    public function __construct(private ?ManagerRegistry $doctrineRegistry = null) {
+    public function __construct(private ?ManagerRegistry $doctrineRegistry = null)
+    {
     }
 
+    /**
+     * @template T of object
+     * @param  class-string<T>|null  $destination
+     *
+     * @return T|class-string<T>|null
+     */
     public function create(
         Mapper                $mapper,
         object                $source,
         ClassMetadata         $sourceClassMetadata,
-        MapMetadataCollection $sourceMapMetadataCollection,
+        MapMetadataCollection $mapMetadataCollection,
         ?string               $destination,
     ): object|string|null {
         /** @var ?Dto $dtoAttribute */
@@ -36,10 +43,10 @@ final readonly class EntityDelegate implements DestinationFactoryInterface
         $identifier = $sourceClassMetadata->getIdentifierProperty()?->getAccessor()->get($source);
 
         if (null !== $this->doctrineRegistry && null !== $identifier && null !== $entityClass) {
-            return $this->fetchEntity($entityClass, $identifier);
+            return $this->fetchEntity($entityClass, $identifier); // @phpstan-ignore-line
         }
 
-        return $entityClass;
+        return $entityClass; // @phpstan-ignore-line
     }
 
     private function supports(?string $entityClass): bool

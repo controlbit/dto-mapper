@@ -23,12 +23,16 @@ final class AttributeBag implements \IteratorAggregate
     }
 
     /**
-     * @param  class-string  $attributeClass
+     * @param  class-string  $instanceClass
      */
-    public function has(string $attributeClass): bool
+    public function has(string $instanceClass): bool
     {
         foreach ($this->attributes as $attribute) {
-            if (\get_class($attribute) === $attributeClass) {
+            if (\get_class($attribute) === $instanceClass) {
+                return true;
+            }
+
+            if (\is_subclass_of($attribute, $instanceClass)) {
                 return true;
             }
         }
@@ -38,18 +42,45 @@ final class AttributeBag implements \IteratorAggregate
 
     /**
      * @template T of object
-     * @param  class-string<T>  $attributeClass
-     * @return T
+     * @param  class-string<T>  $instanceClass
+     *
+     * @return T|null
      */
-    public function get(string $attributeClass): ?object
+    public function get(string $instanceClass): ?object
     {
         foreach ($this->attributes as $attribute) {
-            if (\get_class($attribute) === $attributeClass) {
+            if (\get_class($attribute) === $instanceClass) {
+                return $attribute;
+            }
+
+            if (\is_subclass_of($attribute, $instanceClass)) {
                 return $attribute;
             }
         }
 
         return null;
+    }
+
+    /**
+     * @template T of object
+     * @param  class-string<T>  $instanceClass
+     *
+     * @return T[]
+     */
+    public function getAllOf(string $instanceClass): array
+    {
+        $attributes = [];
+        foreach ($this->attributes as $attribute) {
+            if (\get_class($attribute) === $instanceClass) {
+                $attributes[] = $attribute;
+            }
+
+            if (\is_subclass_of($attribute, $instanceClass)) {
+                $attributes[] = $attribute;
+            }
+        }
+
+        return $attributes;
     }
 
     /**

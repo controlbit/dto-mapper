@@ -21,9 +21,12 @@ final class OptionalStrategy implements ConstructorStrategyInterface
     ) {
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function validate(
         \ReflectionClass      $destinationReflectionClass,
-        MapMetadataCollection $sourceMapMetadataCollection,
+        MapMetadataCollection $mapMetadata,
     ): void {
         $constructor = $destinationReflectionClass->getConstructor();
 
@@ -39,12 +42,15 @@ final class OptionalStrategy implements ConstructorStrategyInterface
         return self::NAME;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function create(
         Mapper                $mapper,
         object                $source,
         ClassMetadata         $sourceMetadata,
-        MapMetadataCollection $sourceMapMetadataCollection,
-        \ReflectionClass      $reflectionClass,
+        MapMetadataCollection $mapMetadata,
+        \ReflectionClass      $destinationReflectionClass,
     ): object {
         try {
             return $this->alwaysStrategy->create(...func_get_args()); // @phpstan-ignore-line

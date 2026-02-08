@@ -6,7 +6,7 @@ namespace ControlBit\Dto\Finder\SetterType;
 use ControlBit\Dto\Contract\Accessor\SetterInterface;
 use ControlBit\Dto\Contract\Mapper\SetterResolverInterface;
 use ControlBit\Dto\MetaData\Class\ClassMetadata;
-use ControlBit\Dto\MetaData\Map\MemberMapMetadata;
+use ControlBit\Dto\MetaData\Map\MapMetadata;
 
 final class Direct implements SetterResolverInterface
 {
@@ -15,11 +15,15 @@ final class Direct implements SetterResolverInterface
     }
 
     public function resolve(
-        ClassMetadata    $destinationMetaData,
-        MemberMapMetadata $memberMapMetadata
+        ClassMetadata $destinationMetaData,
+        MapMetadata   $mapMetadata,
     ): ?SetterInterface {
 
-        $toPropertyMetadata = $destinationMetaData->getProperty($memberMapMetadata->getDestinationMember());
+        if (null === $mapMetadata->getDestinationMember()) {
+            return null;
+        }
+
+        $toPropertyMetadata = $destinationMetaData->getProperty($mapMetadata->getDestinationMember());
 
         return $toPropertyMetadata?->getAccessor()->getSetter();
     }

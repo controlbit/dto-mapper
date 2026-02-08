@@ -16,6 +16,7 @@
                 class="ControlBit\Dto\Mapper\ValueConverter"
         >
             <argument type="tagged_iterator" tag="dto_bundle.value_converter"/>
+            <argument type="service" id="service_container" on-invalid="null"/>
         </service>
 
         <service
@@ -37,6 +38,13 @@
                 class="ControlBit\Dto\Mapper\ValueConverter\EntityIdentifier"
         >
             <tag name="dto_bundle.value_converter" priority="70"/>
+        </service>
+
+        <service
+                id="ControlBit\Dto\Mapper\ValueConverter\DtoToDto"
+                class="ControlBit\Dto\Mapper\ValueConverter\DtoToDto"
+        >
+            <tag name="dto_bundle.value_converter" priority="60"/>
         </service>
 
     </services>

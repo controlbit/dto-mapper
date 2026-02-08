@@ -4,29 +4,21 @@ declare(strict_types=1);
 namespace ControlBit\Dto\MetaData\Map;
 
 /**
- * @implements \IteratorAggregate<MemberMapMetadata>
+ * @implements \IteratorAggregate<MapMetadata>
  */
 final class MapMetadataCollection implements \IteratorAggregate, \Countable
 {
     /**
-     * @var MemberMapMetadata[]
+     * @var MapMetadata[]
      */
     private array $collection = [];
 
-    public function add(MemberMapMetadata $mapMetadata): void
+    public function add(MapMetadata $mapMetadata): void
     {
         $this->collection[] = $mapMetadata;
     }
 
-    /**
-     * @return MemberMapMetadata[]
-     */
-    public function getAll(): array
-    {
-        return $this->collection;
-    }
-
-    public function getHavingDestinationMember(string $member): ?MemberMapMetadata
+    public function getHavingDestinationMember(string $member): ?MapMetadata
     {
         foreach ($this->collection as $mapMetadata) {
             if ($mapMetadata->getDestinationMember() === $member) {

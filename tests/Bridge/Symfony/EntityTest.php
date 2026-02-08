@@ -82,11 +82,11 @@ class EntityTest extends SymfonyTestCase
         $this->mapper->map($source);
     }
 
-    public function testEntityDoesReverseTransformation(): void
+    public function testEntityDoesReverseTransformationWhenInstructed(): void
     {
         $source      = $this->entityManger->getRepository(SampleEntity::class)->find(AppFixtures::$ID);
         $destination = new class() {
-            #[Transformer(CountTransformer::class)]
+            #[Transformer(CountTransformer::class, ['reverse' => true])]
             public int  $count;
         };
 

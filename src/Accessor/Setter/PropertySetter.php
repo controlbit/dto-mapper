@@ -36,28 +36,13 @@ readonly class PropertySetter implements SetterInterface, TransformableInterface
         return $this->attributes;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getTransformerClassOrId(): ?string
+    public function hasTransformersAttributes(): bool
     {
-        foreach ($this->attributes as $attribute) {
-            if ($attribute instanceof Transformer) {
-                return $attribute->getTransformerIdOrClass();
-            }
-        }
-
-        return null;
+        return $this->attributes->has(Transformer::class);
     }
 
-    public function hasTransformer(): bool
+    public function getTransformerAttributes(): array
     {
-        foreach ($this->attributes as $attribute) {
-            if ($attribute instanceof Transformer) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->attributes->getAllOf(Transformer::class);
     }
 }

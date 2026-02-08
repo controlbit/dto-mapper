@@ -1,0 +1,12 @@
+# Changelog
+
+## [1.0.0]
+
+This is first version of DTO Mapper, corrected bugs and added some new features.
+If you were using previous versions 0.*, please update your code to use 1.0.*.
+
+Known BC breaks:
+- MapFrom and MapTo attributes were renamed to From and To.
+- MapFrom and MapTo attributes have member and getter/setter names as parameters instead of just member name.
+- Transformers are now having reversed transform() and reverse() methods, and it's controllable by providing
+`reverse` parameter in attribute.

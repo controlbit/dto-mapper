@@ -18,29 +18,36 @@ final readonly class ConstructedDelegate implements DestinationFactoryInterface
     ) {
     }
 
+    /**
+     * @template T of object
+     * @param  class-string<T>|null  $destination
+     *
+     * @return T|null
+     */
     public function create(
         Mapper                $mapper,
         object                $source,
         ClassMetadata         $sourceClassMetadata,
-        MapMetadataCollection $sourceMapMetadataCollection,
+        MapMetadataCollection $mapMetadataCollection,
         ?string               $destination,
-    ): object|string|null {
+    ): object|null {
         if (null === $destination || !\class_exists($destination)) {
             return null;
         }
 
         /** @var ?Dto $dtoAttribute */
         $dtoAttribute          = $sourceClassMetadata->getAttributes()->get(Dto::class);
+        /** @var \ReflectionClass<T> $destinationReflection */
         $destinationReflection = new \ReflectionClass($destination);
         $constructorStrategy   = $this->getConstructorStrategy($dtoAttribute);
 
-        $constructorStrategy->validate($destinationReflection, $sourceMapMetadataCollection);
+        $constructorStrategy->validate($destinationReflection, $mapMetadataCollection);
 
         return $constructorStrategy->create(
             $mapper,
             $source,
             $sourceClassMetadata,
-            $sourceMapMetadataCollection,
+            $mapMetadataCollection,
             $destinationReflection,
         );
     }

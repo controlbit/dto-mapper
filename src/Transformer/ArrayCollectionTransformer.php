@@ -9,19 +9,25 @@ use Doctrine\Common\Collections\ArrayCollection;
 final class ArrayCollectionTransformer implements TransformerInterface
 {
     /**
-     * @param  array<int|string, mixed>  $value
+     * @template T
+     * @param  array<int|string, T>  $value
+     *
+     * @return ArrayCollection<int|string, T>
      * {@inheritDoc}
      */
-    public function transform(mixed $value): mixed
+    public function transform(mixed $value, array $options = []): mixed
     {
         return new ArrayCollection($value);
     }
 
     /**
-     * @param  ArrayCollection<int|string, mixed>  $value
+     * @template T
+     * @param  ArrayCollection<int|string, T>  $value
+     *
+     * @return array<T>
      * {@inheritDoc}
      */
-    public function reverse(mixed $value): mixed
+    public function reverse(mixed $value, array $options = []): mixed
     {
         return $value->toArray();
     }

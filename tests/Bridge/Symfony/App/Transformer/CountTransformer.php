@@ -8,12 +8,12 @@ use ControlBit\Dto\Contract\Transformer\TransformerInterface;
 final class CountTransformer implements TransformerInterface
 {
 
-    public function transform(mixed $value): mixed
+    public function transform(mixed $value, array $options = []): mixed
     {
         return $value + 100;
     }
 
-    public function reverse(mixed $value): mixed
+    public function reverse(mixed $value, array $options = []): mixed
     {
         return $value - 100;
     }

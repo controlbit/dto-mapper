@@ -18,23 +18,32 @@ final readonly class ClassMetadataFactory
     ) {
     }
 
-    public function create(object $object): ClassMetadata
+    /**
+     * @template T of object
+     * @param  class-string<T>|T  $subject
+     *
+     * @return ClassMetadata<T>
+     */
+    public function create(object|string $subject): ClassMetadata
     {
-        $reflectionObject = new \ReflectionObject($object);
+        $reflection = \is_object($subject) ? new \ReflectionObject($subject) : new \ReflectionClass($subject);
 
         $properties = new PropertyBag();
-        foreach ($reflectionObject->getProperties() as $reflectionProperty) {
-            $properties->add($this->propertyMetadataFactory->create($object, $reflectionProperty->getName()));
+        foreach ($reflection->getProperties() as $reflectionProperty) {
+            $properties->add($this->propertyMetadataFactory->create($subject, $reflectionProperty->getName()));
         }
 
         $methods = new MethodBag();
-        foreach ($reflectionObject->getMethods() as $reflectionMethod) {
-            $methods->add($this->methodMetadataFactory->create($object, $reflectionMethod->getName()));
+        foreach ($reflection->getMethods() as $reflectionMethod) {
+            $methods->add($this->methodMetadataFactory->create($reflection, $reflectionMethod->getName()));
         }
 
+        /** @var class-string<T> $fcqn */
+        $fcqn = $reflection->getName();
+
         return new ClassMetadata(
-            \get_class($object),
-            AttributeBag::fromArray(instantiate_attributes($reflectionObject)),
+            $fcqn,
+            AttributeBag::fromArray(instantiate_attributes($reflection)),
             $properties,
             $methods
         );
