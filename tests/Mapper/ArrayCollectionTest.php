@@ -15,7 +15,7 @@ class ArrayCollectionTest extends LibraryTestCase
         };
 
         $to = new class() {
-            #[Collection(['reverse' => true])]
+            #[Collection]
             public ArrayCollection $foo;
         };
 
@@ -29,4 +29,33 @@ class ArrayCollectionTest extends LibraryTestCase
         $this->assertEquals('qux', $mappedValue->get(1));
         $this->assertEquals('fruit', $mappedValue->get(2));
     }
+
+    public function testMappingArrayCollectionToArray(): void
+    {
+        $from = new class(['baz', 'qux', 'fruit']) {
+            public ArrayCollection $foo;
+
+            public function __construct(array $foo)
+            {
+                $this->foo = new ArrayCollection($foo);
+            }
+        };
+
+        $to = new class() {
+            #[Collection(['reverse' => true])]
+            public array $foo;
+        };
+
+        $mappedObject = $this->getMapper()->map($from, $to);
+
+        /** @var array $mappedValue */
+        $mappedValue = $mappedObject->foo;
+
+        $this->assertEquals(3, \count($mappedValue));
+        $this->assertEquals('baz', $mappedValue[0]);
+        $this->assertEquals('qux', $mappedValue[1]);
+        $this->assertEquals('fruit', $mappedValue[2]);
+    }
+    
+    
 }
