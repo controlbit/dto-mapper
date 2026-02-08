@@ -10,9 +10,9 @@ final class ArrayCollectionTransformer implements TransformerInterface
 {
     /**
      * @template T
-     * @param  ArrayCollection<int|string, T>  $value
+     * @param  array<int|string, T>  $value
      *
-     * @return array<T>
+     * @return ArrayCollection<int|string, T>
      * {@inheritDoc}
      */
     public function transform(mixed $value, array $options = []): mixed
@@ -22,9 +22,9 @@ final class ArrayCollectionTransformer implements TransformerInterface
 
     /**
      * @template T
-     * @param  array<int|string, T>  $value
+     * @param  ArrayCollection<int|string, T>  $value
      *
-     * @return ArrayCollection<int|string, T>
+     * @return array<T>
      * {@inheritDoc}
      */
     public function reverse(mixed $value, array $options = []): mixed
