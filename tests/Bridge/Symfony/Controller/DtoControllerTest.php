@@ -104,4 +104,15 @@ class DtoControllerTest extends SymfonyTestCase
             \json_decode((string)$this->client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR)
         );
     }
+
+    public function testPathParameterIsMapped(): void
+    {
+        $this->client->request(Request::METHOD_GET, '/dto/path/bar');
+
+        self::assertResponseIsSuccessful();
+        self::assertEquals(
+            ['foo' => 'bar'],
+            \json_decode((string)$this->client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR)
+        );
+    }
 }

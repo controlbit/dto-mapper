@@ -20,4 +20,9 @@ final class DtoController extends AbstractController
     {
         return $this->json($dto);
     }
+
+    public function path(#[RequestDto] AssertedDto $dto): Response
+    {
+        return $this->json($dto);
+    }
 }

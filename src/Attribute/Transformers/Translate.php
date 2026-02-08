@@ -39,7 +39,6 @@ final readonly class Translate extends Transformer
             'locale'        => $this->locale,
             'domain'        => $this->domain,
             'modifier'      => $this->modifier,
-            'caseTransform' => $this->modifier,
         ]);
     }
 }

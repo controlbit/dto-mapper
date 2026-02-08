@@ -17,7 +17,7 @@ final class ArrayCollectionTransformer implements TransformerInterface
      */
     public function transform(mixed $value, array $options = []): mixed
     {
-        return $value->toArray();
+        return new ArrayCollection($value);
     }
 
     /**
@@ -29,6 +29,6 @@ final class ArrayCollectionTransformer implements TransformerInterface
      */
     public function reverse(mixed $value, array $options = []): mixed
     {
-        return new ArrayCollection($value);
+        return $value->toArray();
     }
 }

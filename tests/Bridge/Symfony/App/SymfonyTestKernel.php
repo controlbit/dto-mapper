@@ -119,5 +119,9 @@ final class SymfonyTestKernel extends Kernel
             ->add('dto_asserted', '/dto/asserted')
             ->controller(DtoController::class.'::asserted')
         ;
+        $routes
+            ->add('dto_path', '/dto/path/{foo}')
+            ->controller(DtoController::class.'::path')
+        ;
     }
 }
