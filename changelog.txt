@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.0.0] - 2026-02-08
+## [1.0.0]
 
 This is first version of DTO Mapper, corrected bugs and added some new features.
 If you were using previous versions 0.*, please update your code to use 1.0.*.
