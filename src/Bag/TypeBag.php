@@ -8,7 +8,7 @@ final readonly class TypeBag implements \Stringable
     /**
      * @param  array<string|null>  $types
      */
-    public function __construct(private array $types)
+    public function __construct(private array $types = [])
     {
     }
 
