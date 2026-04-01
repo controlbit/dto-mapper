@@ -45,7 +45,7 @@ class MapFromTest extends LibraryTestCase
         $this->assertEquals('foo', $mappedObject->bar);
     }
 
-    public function testCompositeFromOnNested(): void
+    public function testCompositeFromOnNestedScalar(): void
     {
         $from = new NestedDto(nestedDto: new NestedDto(scalar: 'foo'));
 
@@ -57,5 +57,19 @@ class MapFromTest extends LibraryTestCase
         $mappedObject = $this->getMapper()->map($from, $to);
 
         $this->assertEquals('foo', $mappedObject->bar);
+    }
+
+    public function testCompositeFromOnNestedObject(): void
+    {
+        $from = new NestedDto(nestedDto: new NestedDto(nestedDto: new NestedDto(scalar: 'bar')));
+
+        $to = new class() {
+            #[From(member: 'nestedDto.nestedDto')]
+            public $bar;
+        };
+
+        $mappedObject = $this->getMapper()->map($from, $to);
+
+        $this->assertEquals('bar', $mappedObject->bar->scalar);
     }
 }

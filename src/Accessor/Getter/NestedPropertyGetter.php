@@ -51,17 +51,18 @@ final readonly class NestedPropertyGetter implements GetterInterface, Transforma
     public function getLeafProperty(object $object): array
     {
         $parts   = \explode('.', $this->propPath);
+        $partsCount = \count($parts);
         $current = $object;
         $lastObject = null;
 
-        foreach ($parts as $part) {
+        foreach ($parts as $index => $part) {
             $reflection = new \ReflectionObject($current);
             $property   = $reflection->getProperty($part);
             $property->setAccessible(true);
 
             $current = $property->getValue($current);
 
-            if (\is_object($current)) {
+            if (\is_object($current) && ($index + 1) !== $partsCount) {
                 $lastObject = $current;
             }
         }
