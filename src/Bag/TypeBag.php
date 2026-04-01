@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace ControlBit\Dto\Bag;
 
+use function ControlBit\Dto\has_attribute;
+
 final readonly class TypeBag implements \Stringable
 {
     /**
@@ -50,6 +52,22 @@ final readonly class TypeBag implements \Stringable
         }
 
         return null;
+    }
+
+    public function hasAttribute(string $classOrInterface): bool
+    {
+        $classes = \array_filter(
+            $this->types,
+            static fn(?string $type): bool => null !== $type && \class_exists($type),
+        );
+
+        foreach ($classes as $class) {
+            if(has_attribute($class, $classOrInterface) ) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
