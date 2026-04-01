@@ -169,6 +169,32 @@ class OrderDto {
 class Order {
     private float $priceIncludingVat;
 }
+
+```
+
+### Mapping from nested properties
+You can also map from nested properties by using dot notation in the `member` parameter of `#[From]` attribute.
+
+```php
+
+use ControlBit\Dto\Attribute\From;
+
+class ParentDto {
+    public NestedDto $nestedDto;
+}
+
+class NestedDto {
+    public string $scalar;
+}
+
+class Destination {
+    #[From(member: 'nestedDto.scalar')]
+    public string $bar;
+}
+
+$source = new ParentDto(new NestedDto('foo'));
+$mapped = $mapper->map($source, Destination::class);
+// $mapped->bar will be 'foo'
 ```
 
 ### Using custom Setter when mapping on destination object
