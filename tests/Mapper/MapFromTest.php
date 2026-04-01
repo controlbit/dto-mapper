@@ -72,4 +72,7 @@ class MapFromTest extends LibraryTestCase
 
         $this->assertEquals('bar', $mappedObject->bar->scalar);
     }
+
+    // TODO: Add case when NestedDto is Object in Source (not DTO) but mapped into DTO.
+
 }

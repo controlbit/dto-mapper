@@ -15,7 +15,6 @@ use ControlBit\Dto\Bag\TypeBag;
 use ControlBit\Dto\Contract\Accessor\AccessorInterface;
 use ControlBit\Dto\Contract\Accessor\GetterInterface;
 use ControlBit\Dto\Contract\Accessor\SetterInterface;
-use ControlBit\Dto\Exception\InvalidArgumentException;
 use ControlBit\Dto\MetaData\Map\MapMetadata;
 use ControlBit\Dto\Util\TypeTool;
 use function ControlBit\Dto\instantiate_attributes;
@@ -100,7 +99,7 @@ readonly final class AccessorFinder
                 case $member->getSourceMethod() && $reflectionClass->hasMethod($member->getSourceMethod()):
                     $member = $reflectionClass->getMethod($member->getSourceMethod());
                     break;
-                case $this->isNestedMember($member):
+                case $this->isNestedMember($member) && $member->getSourceMember():
                     return new NestedPropertyGetter(
                         $member->getSourceMember(),
                         new TypeBag(),
@@ -172,23 +171,18 @@ readonly final class AccessorFinder
 
     private function getNestedRootMemberName(MapMetadata $member): string
     {
-        return \substr($member->getSourceMember(), 0, \strpos($member->getSourceMember(), '.'));
-    }
+        $sourceMember = $member->getSourceMember();
 
-    public function getLeafProperty(
-        \ReflectionClass|\ReflectionObject $rootReflection,
-        string                             $path,
-    ): \ReflectionProperty {
-        $parts = \explode('.', $path);
-
-        foreach ($parts as $part) {
-            $reflection = empty($current) ? $rootReflection : new \ReflectionClass($current);
-            $property   = $reflection->getProperty($part);
-            $property->setAccessible(true);
-
-            $current = $property->getValue($current);
+        if (null === $sourceMember) {
+            throw new \LogicException('There is no source member. This logic should not happen.');
         }
 
-        return $property;
+        $dotPosition = \strpos($sourceMember, '.');
+
+        if (false === $dotPosition) {
+            throw new \LogicException('There is no nested member. This logic should not happen.');
+        }
+
+        return \substr($sourceMember, 0, $dotPosition);
     }
 }

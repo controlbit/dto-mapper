@@ -20,6 +20,8 @@ final readonly class NestedPropertyGetter implements GetterInterface, Transforma
 
     public function get(object $object): mixed
     {
+        /** @var object $current */
+        /** @var \ReflectionProperty $property */
         [$property, $current] = $this->getLeafProperty($object);
 
         return $property->getValue($current);
@@ -56,11 +58,11 @@ final readonly class NestedPropertyGetter implements GetterInterface, Transforma
         $lastObject = null;
 
         foreach ($parts as $index => $part) {
-            $reflection = new \ReflectionObject($current);
+            $reflection = new \ReflectionObject($current); // @phpstan-ignore-line
             $property   = $reflection->getProperty($part);
             $property->setAccessible(true);
 
-            $current = $property->getValue($current);
+            $current = $property->getValue($current); // @phpstan-ignore-line
 
             if (\is_object($current) && ($index + 1) !== $partsCount) {
                 $lastObject = $current;

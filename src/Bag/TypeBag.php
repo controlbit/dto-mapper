@@ -54,6 +54,9 @@ final readonly class TypeBag implements \Stringable
         return null;
     }
 
+    /**
+     * @param  class-string  $classOrInterface
+     */
     public function hasAttribute(string $classOrInterface): bool
     {
         $classes = \array_filter(
