@@ -27,7 +27,7 @@ final class ObjectToDto implements ValueConverterInterface
             return true;
         }
 
-        if (null !== $setter->getType()->getInstanceOf(Dto::class)) {
+        if (null !== $setter->getType()->hasAttribute(Dto::class)) {
             return true;
         }
 
