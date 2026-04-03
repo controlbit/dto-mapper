@@ -94,6 +94,11 @@ final readonly class AlwaysStrategy implements ConstructorStrategyInterface
 
             /** @var GetterInterface $getter */
             $getter = $sourcePropertyMetadata->getAccessor()->getGetter();
+
+//            if (null === $getter) {
+//                continue;
+//            }
+
             $setter = new ConstructorSetter(
                 new TypeBag(TypeTool::getReflectionTypes($argument)),
                 AttributeBag::fromArray(instantiate_attributes($argument)),
