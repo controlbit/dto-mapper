@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.1.0-rc1]
+- Adding UUID transformer
+
 ## [1.0.0]
 
 This is first version of DTO Mapper, corrected bugs and added some new features.
