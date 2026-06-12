@@ -8,6 +8,7 @@ use ControlBit\Dto\Contract\Accessor\SetterInterface;
 use ControlBit\Dto\Contract\Mapper\MapperInterface;
 use ControlBit\Dto\Contract\Mapper\ValueConverterInterface;
 use ControlBit\Dto\Mapper\Mapper;
+use function ControlBit\Dto\find_attribute;
 
 /**
  * Case when we have some object on the source property side, and we need to convert it/map it to DTO.
@@ -24,11 +25,17 @@ final class DtoToDto implements ValueConverterInterface
             return false;
         }
 
-        if (!$setter->getAttributes()->has(Dto::class)) {
-            return false;
+        $class = $setter->getType()->getOneClass();
+
+        if (null !== find_attribute($class, Dto::class)) {
+            return true;
         }
 
-        return true;
+        if ($setter->getAttributes()->has(Dto::class)) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
