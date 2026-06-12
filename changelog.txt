@@ -3,6 +3,7 @@
 ## [1.1.0-rc1]
 - Adding UUID transformer
 - No need to add #[Dto] on property, when mapping to destination, if destination property class have #[Dto].
+- Added support for Nested mapping
 
 ## [1.0.0]
 

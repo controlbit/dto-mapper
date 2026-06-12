@@ -39,10 +39,9 @@ final class UuidTransformer implements TransformerInterface
     }
 
     /**
-     * @template T of Uuid
      * @param  mixed  $value
      *
-     * @return T|null
+     * @return Uuid|null
      * {@inheritDoc}
      */
     public function reverse(mixed $value, array $options = []): mixed
