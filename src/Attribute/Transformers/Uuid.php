@@ -13,13 +13,8 @@ use ControlBit\Dto\Transformer\UuidTransformer;
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
 final readonly class Uuid extends Transformer
 {
-    public function __construct(
-        /**
-         * class-string<\BackedEnum>
-         */
-        string $class,
-        array  $options = [],
-    ) {
-        parent::__construct(UuidTransformer::class, $options + ['class' => $class]);
+    public function __construct(array $options = [])
+    {
+        parent::__construct(UuidTransformer::class, $options);
     }
 }

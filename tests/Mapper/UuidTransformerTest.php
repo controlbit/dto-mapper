@@ -44,7 +44,7 @@ class UuidTransformerTest extends LibraryTestCase
         };
 
         $to = new class() {
-            #[UuidAttribute(Uuid::class)]
+            #[UuidAttribute]
             public string $foo;
         };
 
@@ -64,7 +64,7 @@ class UuidTransformerTest extends LibraryTestCase
         $from->foo = $uuidString;
 
         $to = new class() {
-            #[UuidAttribute(Uuid::class, options: ['reverse' => true])]
+            #[UuidAttribute(options: ['reverse' => true])]
             public Uuid $foo;
         };
 
