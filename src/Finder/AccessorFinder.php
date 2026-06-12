@@ -5,6 +5,7 @@ namespace ControlBit\Dto\Finder;
 
 use ControlBit\Dto\Accessor\Accessor;
 use ControlBit\Dto\Accessor\Getter\MethodGetter;
+use ControlBit\Dto\Accessor\Getter\NestedPropertyGetter;
 use ControlBit\Dto\Accessor\Getter\PropertyGetter;
 use ControlBit\Dto\Accessor\Setter\MethodSetter;
 use ControlBit\Dto\Accessor\Setter\PropertyReflectionSetter;
@@ -86,7 +87,7 @@ readonly final class AccessorFinder
      * @param  \ReflectionClass<object>|\ReflectionObject<object>  $reflectionClass
      */
     public function findGetter(
-        \ReflectionObject|\ReflectionClass                $reflectionClass,
+        \ReflectionObject|\ReflectionClass $reflectionClass,
         \ReflectionProperty|\ReflectionMethod|MapMetadata $member,
     ): ?GetterInterface {
 
@@ -98,6 +99,12 @@ readonly final class AccessorFinder
                 case $member->getSourceMethod() && $reflectionClass->hasMethod($member->getSourceMethod()):
                     $member = $reflectionClass->getMethod($member->getSourceMethod());
                     break;
+                case $this->isNestedMember($member) && $member->getSourceMember():
+                    return new NestedPropertyGetter(
+                        $member->getSourceMember(),
+                        new TypeBag(),
+                        AttributeBag::fromArray(instantiate_attributes($reflectionClass->getProperty($this->getNestedRootMemberName($member)))),
+                    );
                 default:
                     return null;
             }
@@ -147,5 +154,35 @@ readonly final class AccessorFinder
             \sprintf('has%s', \ucfirst($propName)),
             \sprintf('have%s', \ucfirst($propName)),
         ];
+    }
+
+    private function isNestedMember(MapMetadata $member): bool
+    {
+        if (null === $member->getSourceMember()) {
+            return false;
+        }
+
+        if (!\str_contains($member->getSourceMember(), '.')) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private function getNestedRootMemberName(MapMetadata $member): string
+    {
+        $sourceMember = $member->getSourceMember();
+
+        if (null === $sourceMember) {
+            throw new \LogicException('There is no source member. This logic should not happen.');
+        }
+
+        $dotPosition = \strpos($sourceMember, '.');
+
+        if (false === $dotPosition) {
+            throw new \LogicException('There is no nested member. This logic should not happen.');
+        }
+
+        return \substr($sourceMember, 0, $dotPosition);
     }
 }

@@ -3,12 +3,14 @@ declare(strict_types=1);
 
 namespace ControlBit\Dto\Bag;
 
+use function ControlBit\Dto\has_attribute;
+
 final readonly class TypeBag implements \Stringable
 {
     /**
      * @param  array<string|null>  $types
      */
-    public function __construct(private array $types)
+    public function __construct(private array $types = [])
     {
     }
 
@@ -50,6 +52,25 @@ final readonly class TypeBag implements \Stringable
         }
 
         return null;
+    }
+
+    /**
+     * @param  class-string  $classOrInterface
+     */
+    public function hasAttribute(string $classOrInterface): bool
+    {
+        $classes = \array_filter(
+            $this->types,
+            static fn(?string $type): bool => null !== $type && \class_exists($type),
+        );
+
+        foreach ($classes as $class) {
+            if(has_attribute($class, $classOrInterface) ) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

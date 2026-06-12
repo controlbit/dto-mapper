@@ -41,8 +41,8 @@
         </service>
 
         <service
-                id="ControlBit\Dto\Mapper\ValueConverter\DtoToDto"
-                class="ControlBit\Dto\Mapper\ValueConverter\DtoToDto"
+                id="ControlBit\Dto\Mapper\ValueConverter\ObjectToDto"
+                class="ControlBit\Dto\Mapper\ValueConverter\ObjectToDto"
         >
             <tag name="dto_bundle.value_converter" priority="60"/>
         </service>
