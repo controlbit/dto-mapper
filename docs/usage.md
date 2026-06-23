@@ -325,6 +325,7 @@ They could be put on destination property.
 | `ControlBit\Dto\Attribute\Transformers\FirstElementOfArray` | Uses first element of source array as value for destination.                                                                                                                                                                                                                             |
 | `ControlBit\Dto\Attribute\Transformers\Translate` | Translates source string to desired language on destination. You can provide optionally `domain`, `locale` and `modifier`. Some examples for modifier:`#[Translate(modifier: 'strtoupper')]` or `#[Translate(modifier: [YourStaticClass::class, 'YourStaticMethod', ['Arg1','Arg2']])]`. |
 | `ControlBit\Dto\Attribute\Transformers\Uuid` | Transforms Symfony Uuid object to string and vice versa. Requires the class-string of the Uuid type as the first argument. Use `options: ['reverse' => true]` to map from string to Uuid. Example: `#[Uuid(Uuid::class, options: ['reverse' => true])]` |
+| `ControlBit\Dto\Attribute\Transformers\FileBase64` | Transforms a base64-encoded data URI string into a file on disk and vice versa. Use `options: ['reverse' => true]` to map from a base64 string to a saved file. Example: `#[FileBase64(options: ['reverse' => true])]` |
 
 ### Request to DTO
 
