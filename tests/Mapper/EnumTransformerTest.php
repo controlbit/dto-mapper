@@ -40,4 +40,21 @@ class EnumTransformerTest extends LibraryTestCase
 
         $this->assertEquals(SimpleEnum::FOO->value, $mappedObject->foo);
     }
+
+    public function testFromArrayOfEnumsToArrayOfStrings(): void
+    {
+        $from = new class() {
+            public array $foo = [SimpleEnum::FOO, SimpleEnum::BAR];
+        };
+
+        $to = new class() {
+            #[Enum(SimpleEnum::class, options: ['array' => true])]
+            public array $foo;
+        };
+
+        $mappedObject = $this->getMapper()->map($from, $to);
+
+        $this->assertEquals(SimpleEnum::FOO->value, $mappedObject->foo[0]);
+        $this->assertEquals(SimpleEnum::BAR->value, $mappedObject->foo[1]);
+    }
 }

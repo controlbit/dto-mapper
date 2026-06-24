@@ -6,6 +6,13 @@ namespace ControlBit\Dto\Transformer;
 use ControlBit\Dto\Contract\Transformer\TransformerInterface;
 use Symfony\Component\HttpFoundation\File\File;
 
+/**
+ * @psalm-type ReverseOptions = array{
+ *      chunkSize: ?int,
+ *      tempDir: ?string,
+ *      tempPrefix: ?string
+ *  }|array{}
+ */
 class FileBase64Transformer implements TransformerInterface
 {
     private const DEFAULT_CHUNK_SIZE = 4096;
@@ -23,16 +30,16 @@ class FileBase64Transformer implements TransformerInterface
         $mimeType = \mime_content_type($value->getRealPath()) ?: 'application/octet-stream';
         $contents = \file_get_contents($value->getRealPath());
 
+        if (false === $contents) {
+            return null;
+        }
+
         return \sprintf('data:%s;base64,%s', $mimeType, \base64_encode($contents));
     }
 
     /**
-     * @param  mixed  $value
-     * @param  array{
-     *     chunkSize: ?int,
-     *     tempDir: ?string,
-     *     tempPrefix: ?string
-     * }              $options
+     * @param  mixed           $value
+     * @param  ReverseOptions  $options
      *
      * @return ?\SplFileInfo
      */
@@ -57,7 +64,7 @@ class FileBase64Transformer implements TransformerInterface
     }
 
     /**
-     * @param  array{tempDir: ?string, tempPrefix: ?string}  $options
+     * @param  ReverseOptions  $options
      */
     private function getFilePath(?string $mimeType, array $options): string
     {
@@ -67,11 +74,13 @@ class FileBase64Transformer implements TransformerInterface
         );
 
         if (null !== $mimeType && \class_exists('\Symfony\Component\Mime\MimeTypes')) {
-            $mimeTypes = new Symfony\Component\Mime\MimeTypes();
+            $mimeTypes = new Symfony\Component\Mime\MimeTypes(); // @phpstan-ignore class.notFound
+
+            // @phpstan-ignore-next-line
             $extension = $mimeTypes->getExtensions($mimeType)[0] ?? null;
 
             if (null !== $extension) {
-                $newPath = $tmpPath.'.'.$extension;
+                $newPath = $tmpPath . '.' . $extension; // @phpstan-ignore binaryOp.invalid
                 \rename($tmpPath, $newPath);
 
                 return $newPath;

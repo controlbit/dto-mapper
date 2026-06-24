@@ -51,11 +51,11 @@ final readonly class ValueConverter
      * @phpstan-param ClassMetadata<object> $sourceMetadata
      */
     private function applyTransformers(
-        mixed                      $value,
-        ClassMetadata              $sourceMetadata,
-        GetterInterface            $getter,
-        SetterInterface            $setter,
-        bool                       $isSourceTransformerOnly,
+        mixed           $value,
+        ClassMetadata   $sourceMetadata,
+        GetterInterface $getter,
+        SetterInterface $setter,
+        bool            $isSourceTransformerOnly,
     ): mixed {
         if ($getter instanceof TransformableInterface && $isSourceTransformerOnly) {
             $value = $this->transform($value, $sourceMetadata, $getter, true);
@@ -86,7 +86,8 @@ final readonly class ValueConverter
 
     /**
      * @phpstan-param ClassMetadata<object> $sourceMetadata
-     * @param  TransformableInterface  $transformable
+     *
+     * @param  TransformableInterface       $transformable
      */
     private function transform(
         mixed                  $value,
@@ -105,6 +106,18 @@ final readonly class ValueConverter
             $options             = $attribute->getOptions();
             $transformerInstance = $this->instantiateTransformer($classOrId);
             $isReverseTransform  = $this->shouldReverseTransform($attribute, $sourceMetadata, $isSourceTransformerOnly);
+            $isArrayTransform    = $attribute->getOptions()['array'] ?? false;
+
+            if (\is_array($value) && $isArrayTransform) {
+                $value = \array_map(
+                    static fn(mixed $item) => $isReverseTransform
+                        ? $transformerInstance->reverse($item, $options)
+                        : $transformerInstance->transform($item, $options),
+                    $value,
+                );
+
+                return $value;
+            }
 
             $value = $isReverseTransform
                 ? $transformerInstance->reverse($value, $options)

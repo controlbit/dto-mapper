@@ -118,7 +118,7 @@ and calling just:
 This is useful if you want to constrain your DTO to be mapped only to certain type of object.
 
 ### From Object to DTO
-Similar to the previous one, but reversed. Also, let's make it litle more complex:
+Similar to the previous one, but reversed. Also, let's make it little more complex:
 ```php
 
 class Foo {
@@ -269,6 +269,8 @@ and when you, for example, want to make EnumTransformer, you will need to implem
 - `reverse()` - Opposite, you are providing transformation from Enum to string.
 
 To use `reverse` transformation, in attribute, pass `reverse: true` in $options argument.
+If your transformer need to handle array and apply transformer to each element, in attribute, 
+pass `array: true` in $options argument.
 
 Let's see one example for transformer that multiplies value by 1000:
 
