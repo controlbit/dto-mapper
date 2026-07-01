@@ -19,6 +19,7 @@
         - [Updating an existing entity](#updating-an-existing-entity)
         - [Creating a new entity](#creating-a-new-entity)
         - [Important notes](#important-notes)
+    - [Dto Processor](#dto-processor)
     - [Constructor strategy](#constructor-strategy)
         - [Available Strategies](#available-strategies)
 
@@ -147,7 +148,6 @@ Now, you can see that there's another nested dto, of the same class (but could b
 Also, you can see an array of DTOs there. 
 The DTO Mapper will look at the types you provide in destination and will try to map them accordingly.
 For arrays, as DTO Mapper doesn't know what type of object you want to put in it, as you can se in case of `$arrayOfFoo`.
-
 
 ## Some additional features
 
@@ -423,6 +423,62 @@ $product = $mapper->map($dto);
 - The `#[Identifier]` attribute is required for DTO Mapper to know which property to use as the database ID when fetching an existing entity.
 - If you use DTO Mapper as a Symfony bundle and have `doctrine/orm` installed, the `EntityManager` will be automatically used to fetch entities.
 - If an entity with the given identifier is not found, a `ControlBit\Dto\Exception\EntityNotFoundException` will be thrown.
+
+### Dto Processor
+
+The Processor feature lets you use your custom logic to modify Desination object class where usual Transformers are 
+not enough, that runs **before** or **after** mapping.
+It's a powerful tool, and should be used only where existing functionalities cannot cover complex cases.
+Some complex case would be to make one destination object property depend on more than one source object properties.
+
+
+Create a class implementing `ControlBit\Dto\Contract\ProcessorInterface`:
+
+```php
+use ControlBit\Dto\Contract\ProcessorInterface;
+
+final class IncrementProcessor implements ProcessorInterface
+{
+    public function process(object|array $source, object $dto): void
+    {
+        $dto->foo++;
+    }
+}
+```
+
+Then attach it to your DTO with the `#[Processor]` attribute. Use `ProcessorLoad::BEFORE_MAPPING` to run before mapping (default is `ProcessorLoad::AFTER_MAPPING`):
+
+```php
+use ControlBit\Dto\Attribute\Processor;
+use ControlBit\Dto\Enum\ProcessorLoad;
+
+// Runs after mapping (default)
+#[Processor(IncrementProcessor::class)]
+class MyDto
+{
+    public int $foo;
+}
+```
+
+```php
+// Runs before mapping
+#[Processor(IncrementProcessor::class, ProcessorLoad::BEFORE_MAPPING)]
+class MyDto
+{
+    public int $foo;
+}
+```
+
+Important to know:
+- The processor receives the original source and the destination DTO so you can modify either before or after 
+the mapper copies values. Keep in mind that using Processor Before mapping will not stop processor 
+to overwrite values if changed some on DTO, therfore, it's a recommendation to use Before Processor to modify values 
+for destination properties that have #[Ignore] attribute.
+
+- Source object ($source) is cloned from original source, main reasons for this are to avoid any accidental modification and 
+keep your codebase clean, as putting some business logic inside this processor would be very bad practice. 
+
+
 
 ### Constructor strategy
 

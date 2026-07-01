@@ -5,6 +5,7 @@ namespace ControlBit\Dto\Mapper;
 
 use ControlBit\Dto\Attribute\Dto;
 use ControlBit\Dto\Contract\Mapper\MapperInterface;
+use ControlBit\Dto\Enum\ProcessorLoad;
 use ControlBit\Dto\Exception\InvalidArgumentException;
 use ControlBit\Dto\Exception\PropertyMapException;
 use ControlBit\Dto\Destination\DestinationFactory;
@@ -14,6 +15,7 @@ use ControlBit\Dto\MetaData\Class\ClassMetadata;
 use ControlBit\Dto\MetaData\Class\ClassMetadataFactory;
 use ControlBit\Dto\MetaData\Map\MapMetadataCollection;
 use ControlBit\Dto\MetaData\Map\MapMetadataFactory;
+use ControlBit\Dto\Processor\Processor;
 use ControlBit\Dto\Util\Initializer;
 
 final readonly class Mapper implements MapperInterface
@@ -25,6 +27,7 @@ final readonly class Mapper implements MapperInterface
         private ValueConverter       $valueConverter,
         private SetterFinder         $setterFinder,
         private AccessorFinder       $accessorFinder,
+        private Processor            $processor,
     ) {
     }
 
@@ -72,6 +75,8 @@ final readonly class Mapper implements MapperInterface
             );
         }
 
+        $this->processor->process($source, $destination, ProcessorLoad::BEFORE_MAPPING);
+
         $destination = $this->execute(
             $source,
             $destination,
@@ -81,6 +86,8 @@ final readonly class Mapper implements MapperInterface
         );
 
         Initializer::autoInitialize($destination, $destinationMetadata);
+
+        $this->processor->process($source, $destination, ProcessorLoad::AFTER_MAPPING);
 
         return $destination; // @phpstan-ignore-line
     }
@@ -104,7 +111,7 @@ final readonly class Mapper implements MapperInterface
         MapMetadataCollection $mapMetadataCollection,
     ): object {
         foreach ($mapMetadataCollection as $mapMetadata) {
-            if ($mapMetadata->isMappedInConstructor()) {
+            if ($mapMetadata->isMappedInConstructor() || $mapMetadata->isIgnored()) {
                 continue;
             }
 

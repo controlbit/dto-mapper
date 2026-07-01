@@ -51,7 +51,13 @@ final class MapMetadataFactory
 
             $mapMetadata->add(match (true) {
                 $attributes->has(From::class) => $this->mapFrom($propertyMetadata, $attributes),
-                default                       => new MapMetadata($member, null, $member, null),
+                default                       => new MapMetadata(
+                    $member,
+                    null,
+                    $member,
+                    null,
+                    $propertyMetadata->hasIgnoreAttribute()
+                ),
             });
         }
 
@@ -68,6 +74,7 @@ final class MapMetadataFactory
             null,
             $attribute->getMember(),
             $attribute->getSetter(),
+            $propertyMetadata->hasIgnoreAttribute(),
         );
     }
 
@@ -81,6 +88,7 @@ final class MapMetadataFactory
             $attribute->getGetter(),
             $propertyMetadata->getName(),
             null,
+            $propertyMetadata->hasIgnoreAttribute(),
         );
     }
 }

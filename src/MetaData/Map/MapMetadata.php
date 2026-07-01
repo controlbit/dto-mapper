@@ -14,6 +14,7 @@ final class MapMetadata
         private readonly ?string $destinationMember = null,
         private readonly ?string $destinationMethod = null,
         private bool             $mappedInConstructor = false,
+        private readonly bool    $ignore = false,
     ) {
     }
 
@@ -47,5 +48,10 @@ final class MapMetadata
     public function getSourceMethod(): ?string
     {
         return $this->sourceMethod;
+    }
+
+    public function isIgnored(): bool
+    {
+        return $this->ignore;
     }
 }
