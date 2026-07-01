@@ -19,6 +19,7 @@
         - [Updating an existing entity](#updating-an-existing-entity)
         - [Creating a new entity](#creating-a-new-entity)
         - [Important notes](#important-notes)
+    - [Dto Processor](#dto-processor)
     - [Constructor strategy](#constructor-strategy)
         - [Available Strategies](#available-strategies)
 
@@ -118,7 +119,7 @@ and calling just:
 This is useful if you want to constrain your DTO to be mapped only to certain type of object.
 
 ### From Object to DTO
-Similar to the previous one, but reversed. Also, let's make it litle more complex:
+Similar to the previous one, but reversed. Also, let's make it little more complex:
 ```php
 
 class Foo {
@@ -148,7 +149,6 @@ Also, you can see an array of DTOs there.
 The DTO Mapper will look at the types you provide in destination and will try to map them accordingly.
 For arrays, as DTO Mapper doesn't know what type of object you want to put in it, as you can se in case of `$arrayOfFoo`.
 
-
 ## Some additional features
 
 ### Specifying on which property to map to.
@@ -169,6 +169,32 @@ class OrderDto {
 class Order {
     private float $priceIncludingVat;
 }
+
+```
+
+### Mapping from nested properties
+You can also map from nested properties by using dot notation in the `member` parameter of `#[From]` attribute.
+
+```php
+
+use ControlBit\Dto\Attribute\From;
+
+class ParentDto {
+    public NestedDto $nestedDto;
+}
+
+class NestedDto {
+    public string $scalar;
+}
+
+class Destination {
+    #[From(member: 'nestedDto.scalar')]
+    public string $bar;
+}
+
+$source = new ParentDto(new NestedDto('foo'));
+$mapped = $mapper->map($source, Destination::class);
+// $mapped->bar will be 'foo'
 ```
 
 ### Using custom Setter when mapping on destination object
@@ -243,6 +269,8 @@ and when you, for example, want to make EnumTransformer, you will need to implem
 - `reverse()` - Opposite, you are providing transformation from Enum to string.
 
 To use `reverse` transformation, in attribute, pass `reverse: true` in $options argument.
+If your transformer need to handle array and apply transformer to each element, in attribute, 
+pass `array: true` in $options argument.
 
 Let's see one example for transformer that multiplies value by 1000:
 
@@ -298,6 +326,8 @@ They could be put on destination property.
 | `ControlBit\Dto\Attribute\Transformers\Enum` | Transforms source's int\|string value to Enum on Desination.                                                                                                                                                                                                                             |
 | `ControlBit\Dto\Attribute\Transformers\FirstElementOfArray` | Uses first element of source array as value for destination.                                                                                                                                                                                                                             |
 | `ControlBit\Dto\Attribute\Transformers\Translate` | Translates source string to desired language on destination. You can provide optionally `domain`, `locale` and `modifier`. Some examples for modifier:`#[Translate(modifier: 'strtoupper')]` or `#[Translate(modifier: [YourStaticClass::class, 'YourStaticMethod', ['Arg1','Arg2']])]`. |
+| `ControlBit\Dto\Attribute\Transformers\Uuid` | Transforms Symfony Uuid object to string and vice versa. Requires the class-string of the Uuid type as the first argument. Use `options: ['reverse' => true]` to map from string to Uuid. Example: `#[Uuid(Uuid::class, options: ['reverse' => true])]` |
+| `ControlBit\Dto\Attribute\Transformers\FileBase64` | Transforms a base64-encoded data URI string into a file on disk and vice versa. Use `options: ['reverse' => true]` to map from a base64 string to a saved file. Example: `#[FileBase64(options: ['reverse' => true])]` |
 
 ### Request to DTO
 
@@ -393,6 +423,62 @@ $product = $mapper->map($dto);
 - The `#[Identifier]` attribute is required for DTO Mapper to know which property to use as the database ID when fetching an existing entity.
 - If you use DTO Mapper as a Symfony bundle and have `doctrine/orm` installed, the `EntityManager` will be automatically used to fetch entities.
 - If an entity with the given identifier is not found, a `ControlBit\Dto\Exception\EntityNotFoundException` will be thrown.
+
+### Dto Processor
+
+The Processor feature lets you use your custom logic to modify Desination object class where usual Transformers are 
+not enough, that runs **before** or **after** mapping.
+It's a powerful tool, and should be used only where existing functionalities cannot cover complex cases.
+Some complex case would be to make one destination object property depend on more than one source object properties.
+
+
+Create a class implementing `ControlBit\Dto\Contract\ProcessorInterface`:
+
+```php
+use ControlBit\Dto\Contract\ProcessorInterface;
+
+final class IncrementProcessor implements ProcessorInterface
+{
+    public function process(object|array $source, object $dto): void
+    {
+        $dto->foo++;
+    }
+}
+```
+
+Then attach it to your DTO with the `#[Processor]` attribute. Use `ProcessorLoad::BEFORE_MAPPING` to run before mapping (default is `ProcessorLoad::AFTER_MAPPING`):
+
+```php
+use ControlBit\Dto\Attribute\Processor;
+use ControlBit\Dto\Enum\ProcessorLoad;
+
+// Runs after mapping (default)
+#[Processor(IncrementProcessor::class)]
+class MyDto
+{
+    public int $foo;
+}
+```
+
+```php
+// Runs before mapping
+#[Processor(IncrementProcessor::class, ProcessorLoad::BEFORE_MAPPING)]
+class MyDto
+{
+    public int $foo;
+}
+```
+
+Important to know:
+- The processor receives the original source and the destination DTO so you can modify either before or after 
+the mapper copies values. Keep in mind that using Processor Before mapping will not stop processor 
+to overwrite values if changed some on DTO, therfore, it's a recommendation to use Before Processor to modify values 
+for destination properties that have #[Ignore] attribute.
+
+- Source object ($source) is cloned from original source, main reasons for this are to avoid any accidental modification and 
+keep your codebase clean, as putting some business logic inside this processor would be very bad practice. 
+
+
 
 ### Constructor strategy
 

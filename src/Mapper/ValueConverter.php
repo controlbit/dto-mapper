@@ -42,6 +42,21 @@ final readonly class ValueConverter
     ): mixed {
         $isSourceTransformerOnly = $this->shouldFollowSourceTransformerOnly($sourceMetadata, $getter);
 
+        $value = $this->applyTransformers($value, $sourceMetadata, $getter, $setter, $isSourceTransformerOnly);
+
+        return $this->applyValueConverters($mapper, $setter, $value);
+    }
+
+    /**
+     * @phpstan-param ClassMetadata<object> $sourceMetadata
+     */
+    private function applyTransformers(
+        mixed           $value,
+        ClassMetadata   $sourceMetadata,
+        GetterInterface $getter,
+        SetterInterface $setter,
+        bool            $isSourceTransformerOnly,
+    ): mixed {
         if ($getter instanceof TransformableInterface && $isSourceTransformerOnly) {
             $value = $this->transform($value, $sourceMetadata, $getter, true);
         }
@@ -50,6 +65,14 @@ final readonly class ValueConverter
             $value = $this->transform($value, $sourceMetadata, $setter, false);
         }
 
+        return $value;
+    }
+
+    private function applyValueConverters(
+        Mapper          $mapper,
+        SetterInterface $setter,
+        mixed           $value,
+    ): mixed {
         foreach ($this->valueConverters as $valueConverter) {
             if (!$valueConverter->supports($setter, $value)) {
                 continue;
@@ -62,10 +85,9 @@ final readonly class ValueConverter
     }
 
     /**
-     * @template S of object
+     * @phpstan-param ClassMetadata<object> $sourceMetadata
      *
-     * @param  ClassMetadata<S>        $sourceMetadata
-     * @param  TransformableInterface  $transformable
+     * @param  TransformableInterface       $transformable
      */
     private function transform(
         mixed                  $value,
@@ -84,6 +106,18 @@ final readonly class ValueConverter
             $options             = $attribute->getOptions();
             $transformerInstance = $this->instantiateTransformer($classOrId);
             $isReverseTransform  = $this->shouldReverseTransform($attribute, $sourceMetadata, $isSourceTransformerOnly);
+            $isArrayTransform    = $attribute->getOptions()['array'] ?? false;
+
+            if (\is_array($value) && $isArrayTransform) {
+                $value = \array_map(
+                    static fn(mixed $item) => $isReverseTransform
+                        ? $transformerInstance->reverse($item, $options)
+                        : $transformerInstance->transform($item, $options),
+                    $value,
+                );
+
+                return $value;
+            }
 
             $value = $isReverseTransform
                 ? $transformerInstance->reverse($value, $options)
@@ -140,9 +174,7 @@ final readonly class ValueConverter
     }
 
     /**
-     * @template S of object
-     *
-     * @param  ClassMetadata<S>  $sourceMetadata
+     * @phpstan-param ClassMetadata<object> $sourceMetadata
      */
     private function shouldFollowSourceTransformerOnly(ClassMetadata $sourceMetadata, GetterInterface $getter): bool
     {
@@ -160,8 +192,7 @@ final readonly class ValueConverter
     }
 
     /**
-     * @template S of object
-     * @param  ClassMetadata<S>  $sourceMetadata
+     * @phpstan-param ClassMetadata<object> $sourceMetadata
      */
     private function shouldReverseTransform(
         Transformer   $transformerAttribute,

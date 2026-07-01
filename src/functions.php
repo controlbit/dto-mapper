@@ -36,6 +36,32 @@ function find_attribute(mixed $subject, string $attributeClass): ?object
 
 /**
  * @template T of object
+ * @param  object|\ReflectionProperty|class-string  $subject
+ * @param  class-string<T>                          $attributeClass
+ */
+function has_attribute(mixed $subject, string $attributeClass): bool
+{
+    if (\is_string($subject)) {
+        $subject = new \ReflectionClass($subject);
+    }
+
+    if (!$subject instanceof \Reflector) {
+        $subject = new \ReflectionObject($subject);
+    }
+
+    /** @var \ReflectionAttribute[] $dtoPropAttributes */
+    /** @var \ReflectionObject $subject */
+    $dtoPropAttributes = $subject->getAttributes();
+
+    $reflectionAttribute = current(
+        array_filter($dtoPropAttributes, static fn($attribute) => $attribute->getName() === $attributeClass)
+    );
+
+    return false !== $reflectionAttribute;
+}
+
+/**
+ * @template T of object
  * @param  \ReflectionProperty|\ReflectionMethod|\ReflectionObject|\ReflectionClass<T>|\ReflectionParameter  $reflection
  *
  * @return object[]

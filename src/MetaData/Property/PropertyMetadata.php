@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace ControlBit\Dto\MetaData\Property;
 
+use ControlBit\Dto\Attribute\Ignore;
 use ControlBit\Dto\Attribute\Transformer;
 use ControlBit\Dto\Bag\AttributeBag;
 use ControlBit\Dto\Bag\TypeBag;
@@ -54,5 +55,10 @@ final readonly class PropertyMetadata implements AttributedInterface, Transforma
     public function getTransformerAttributes(): array
     {
         return $this->attributes->getAllOf(Transformer::class);
+    }
+
+    public function hasIgnoreAttribute(): bool
+    {
+        return $this->attributes->has(Ignore::class);
     }
 }

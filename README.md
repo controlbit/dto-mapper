@@ -25,4 +25,3 @@ Next, read [Usage](docs/usage.md) and you're good!
 - Mapping UploadedFile into \SplFileInfo (could be that half of it is working already)
 - Caching Mapping Metadata
 - Improve error messages
-- Imrove `From` attribute with support for nested objects. ex From('foo.bar.baz')

@@ -25,6 +25,7 @@ use ControlBit\Dto\MetaData\Class\ClassMetadataFactory;
 use ControlBit\Dto\MetaData\Map\MapMetadataFactory;
 use ControlBit\Dto\MetaData\Method\MethodMetadataFactory;
 use ControlBit\Dto\MetaData\Property\PropertyMetadataFactory;
+use ControlBit\Dto\Processor\Processor;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
@@ -82,6 +83,8 @@ final class Factory
             ]
         );
 
+        $processor = new Processor();
+
         return new Mapper(
             $objectMetadataFactory,
             $mapMetadataFactory,
@@ -89,6 +92,7 @@ final class Factory
             $valueConverter,
             $setterFinder,
             $accessorFinder,
+            $processor,
         );
     }
 }

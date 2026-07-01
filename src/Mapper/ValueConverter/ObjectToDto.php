@@ -5,14 +5,13 @@ namespace ControlBit\Dto\Mapper\ValueConverter;
 
 use ControlBit\Dto\Attribute\Dto;
 use ControlBit\Dto\Contract\Accessor\SetterInterface;
-use ControlBit\Dto\Contract\Mapper\MapperInterface;
 use ControlBit\Dto\Contract\Mapper\ValueConverterInterface;
 use ControlBit\Dto\Mapper\Mapper;
 
 /**
  * Case when we have some object on the source property side, and we need to convert it/map it to DTO.
  */
-final class DtoToDto implements ValueConverterInterface
+final class ObjectToDto implements ValueConverterInterface
 {
     public function supports(SetterInterface $setter, mixed $value): bool
     {
@@ -24,11 +23,15 @@ final class DtoToDto implements ValueConverterInterface
             return false;
         }
 
-        if (!$setter->getAttributes()->has(Dto::class)) {
-            return false;
+        if ($setter->getAttributes()->has(Dto::class)) {
+            return true;
         }
 
-        return true;
+        if ($setter->getType()->hasAttribute(Dto::class)) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

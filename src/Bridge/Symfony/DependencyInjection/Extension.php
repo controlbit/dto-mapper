@@ -53,5 +53,6 @@ class Extension extends SymfonyExtension
         $loader->load('mapper.xml');
         $loader->load('event_listener.xml');
         $loader->load('transformer.xml');
+        $loader->load('processor.xml');
     }
 }

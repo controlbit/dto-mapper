@@ -4,6 +4,7 @@ namespace ControlBit\Dto\Tests\Mapper;
 
 use ControlBit\Dto\Attribute\From;
 use ControlBit\Dto\Tests\LibraryTestCase;
+use ControlBit\Dto\Tests\Resources\NestedDto;
 
 class MapFromTest extends LibraryTestCase
 {
@@ -43,4 +44,35 @@ class MapFromTest extends LibraryTestCase
 
         $this->assertEquals('foo', $mappedObject->bar);
     }
+
+    public function testCompositeFromOnNestedScalar(): void
+    {
+        $from = new NestedDto(nestedDto: new NestedDto(scalar: 'foo'));
+
+        $to = new class() {
+            #[From(member: 'nestedDto.scalar')]
+            public $bar;
+        };
+
+        $mappedObject = $this->getMapper()->map($from, $to);
+
+        $this->assertEquals('foo', $mappedObject->bar);
+    }
+
+    public function testCompositeFromOnNestedObject(): void
+    {
+        $from = new NestedDto(nestedDto: new NestedDto(nestedDto: new NestedDto(scalar: 'bar')));
+
+        $to = new class() {
+            #[From(member: 'nestedDto.nestedDto')]
+            public $bar;
+        };
+
+        $mappedObject = $this->getMapper()->map($from, $to);
+
+        $this->assertEquals('bar', $mappedObject->bar->scalar);
+    }
+
+    // TODO: Add case when NestedDto is Object in Source (not DTO) but mapped into DTO.
+
 }

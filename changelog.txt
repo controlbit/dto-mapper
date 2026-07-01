@@ -1,8 +1,15 @@
 # Changelog
 
+## [1.1.0]
+- Adding UUID transformer
+- No need to add #[Dto] on property, when mapping to destination, if destination property class have #[Dto].
+- Added support for Nested mapping
+- Added support for transformer, when have array to transform, to transform each element (optional)
+- Added Dto Processor, a new feature to process Dto before or after mapping.
+
 ## [1.0.0]
 
-This is first version of DTO Mapper, corrected bugs and added some new features.
+This is the first version of DTO Mapper, corrected bugs and added some new features.
 If you were using previous versions 0.*, please update your code to use 1.0.*.
 
 Known BC breaks:
