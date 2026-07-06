@@ -10,6 +10,7 @@ use ControlBit\Dto\Contract\DestinationFactoryInterface;
 use ControlBit\Dto\Mapper\Mapper;
 use ControlBit\Dto\MetaData\Class\ClassMetadata;
 use ControlBit\Dto\MetaData\Map\MapMetadataCollection;
+use function ControlBit\Dto\find_attribute;
 
 final readonly class ConstructedDelegate implements DestinationFactoryInterface
 {
@@ -35,10 +36,9 @@ final readonly class ConstructedDelegate implements DestinationFactoryInterface
             return null;
         }
 
-        /** @var ?Dto $dtoAttribute */
-        $dtoAttribute          = $sourceClassMetadata->getAttributes()->get(Dto::class);
         /** @var \ReflectionClass<T> $destinationReflection */
         $destinationReflection = new \ReflectionClass($destination);
+        $dtoAttribute          = find_attribute($destinationReflection, Dto::class);
         $constructorStrategy   = $this->getConstructorStrategy($dtoAttribute);
 
         $constructorStrategy->validate($destinationReflection, $mapMetadataCollection);
