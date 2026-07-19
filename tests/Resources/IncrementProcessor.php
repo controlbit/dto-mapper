@@ -7,6 +7,7 @@ use ControlBit\Dto\Contract\ProcessorInterface;
 
 final class IncrementProcessor implements ProcessorInterface
 {
+
     public function process(object|array $source, object $dto): void
     {
         $dto->foo++;
