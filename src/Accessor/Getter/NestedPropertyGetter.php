@@ -20,11 +20,15 @@ final readonly class NestedPropertyGetter implements GetterInterface, Transforma
 
     public function get(object $object): mixed
     {
-        /** @var object $current */
-        /** @var \ReflectionProperty $property */
-        [$property, $current] = $this->getLeafProperty($object);
+        $parts = \explode('.', $this->propPath);
+        /** @var object $item */
+        $item = $object;
 
-        return $property->getValue($current);
+        foreach ($parts as $part) {
+            $item = $this->getValueOfCurrent($item, $part); // @phpstan-ignore-line
+        }
+
+        return $item;
     }
 
     public function getAttributes(): AttributeBag
@@ -48,27 +52,18 @@ final readonly class NestedPropertyGetter implements GetterInterface, Transforma
     }
 
     /**
-     * @return array{\ReflectionProperty, mixed}
+     * @param  object[]|object  $current
      */
-    public function getLeafProperty(object $object): array
+    private function getValueOfCurrent(object|array $current, string $part): mixed
     {
-        $parts   = \explode('.', $this->propPath);
-        $partsCount = \count($parts);
-        $current = $object;
-        $lastObject = null;
-
-        foreach ($parts as $index => $part) {
-            $reflection = new \ReflectionObject($current); // @phpstan-ignore-line
-            $property   = $reflection->getProperty($part);
-            $property->setAccessible(true);
-
-            $current = $property->getValue($current); // @phpstan-ignore-line
-
-            if (\is_object($current) && ($index + 1) !== $partsCount) {
-                $lastObject = $current;
-            }
+        if (\is_array($current)) {
+            return $current[$part] ?? null;
         }
 
-        return [$property, $lastObject];
+        $reflection = new \ReflectionObject($current);
+        $property   = $reflection->getProperty($part);
+        $property->setAccessible(true);
+
+        return $property->getValue($current);
     }
 }

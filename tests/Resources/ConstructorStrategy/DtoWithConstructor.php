@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace ControlBit\Dto\Tests\Resources;
+namespace ControlBit\Dto\Tests\Resources\ConstructorStrategy;
 
 final class DtoWithConstructor
 {

@@ -42,4 +42,17 @@ class ProcessorTest extends LibraryTestCase
 
         $this->assertEquals(4, $mappedObject->foo);
     }
+
+    public function testProcessorOnArraySource(): void
+    {
+        $from = ['foo' => 2];
+
+        $to = new #[Processor(IncrementProcessor::class)] class()  {
+            public int $foo = 1;
+        };
+
+        $mappedObject = $this->getMapper()->map($from, $to);
+
+        $this->assertEquals(3, $mappedObject->foo);
+    }
 }

@@ -45,6 +45,8 @@ final readonly class Mapper implements MapperInterface
      */
     public function map(object|array $source, string|object|null $destination = null): object
     {
+        $originalSource = $source; // Keeping Copy of source object, because of processor.
+
         // Preparing source object. It must be objected to.
         $source = \is_object($source) ? $source : (object)$source;
 
@@ -75,7 +77,7 @@ final readonly class Mapper implements MapperInterface
             );
         }
 
-        $this->processor->process($source, $destination, ProcessorLoad::BEFORE_MAPPING);
+        $this->processor->process($originalSource, $destination, ProcessorLoad::BEFORE_MAPPING);
 
         $destination = $this->execute(
             $source,
@@ -87,7 +89,7 @@ final readonly class Mapper implements MapperInterface
 
         Initializer::autoInitialize($destination, $destinationMetadata);
 
-        $this->processor->process($source, $destination, ProcessorLoad::AFTER_MAPPING);
+        $this->processor->process($originalSource, $destination, ProcessorLoad::AFTER_MAPPING);
 
         return $destination; // @phpstan-ignore-line
     }

@@ -73,6 +73,35 @@ class MapFromTest extends LibraryTestCase
         $this->assertEquals('bar', $mappedObject->bar->scalar);
     }
 
-    // TODO: Add case when NestedDto is Object in Source (not DTO) but mapped into DTO.
+    public function testAccessingArrayElements(): void
+    {
+        $array = ['foo' => ['bar', 'baz', 'waldoo']];
 
+        $from = new NestedDto(nestedDto: new NestedDto(scalarArray: $array));
+
+        $to = new class() {
+            #[From(member: 'nestedDto.scalarArray.foo.1')]
+            public $bar;
+        };
+
+        $mappedObject = $this->getMapper()->map($from, $to);
+
+        $this->assertEquals('baz', $mappedObject->bar);
+    }
+
+    public function testAccessingArrayElementsStrict(): void
+    {
+        $array = ['foo' => ['bar', '1' => 'baz', 'waldoo']];
+
+        $from = new NestedDto(nestedDto: new NestedDto(scalarArray: $array));
+
+        $to = new class() {
+            #[From(member: 'nestedDto.scalarArray.foo.1')]
+            public $bar;
+        };
+
+        $mappedObject = $this->getMapper()->map($from, $to);
+
+        $this->assertEquals('baz', $mappedObject->bar);
+    }
 }

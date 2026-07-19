@@ -5,11 +5,13 @@ namespace ControlBit\Dto\Tests\Mapper;
 
 use ControlBit\Dto\Attribute\Dto;
 use ControlBit\Dto\Enum\ConstructorStrategy;
-use ControlBit\Dto\Exception\InvalidArgumentException;
 use ControlBit\Dto\Exception\MissingArgumentException;
 use ControlBit\Dto\Factory;
 use ControlBit\Dto\Tests\LibraryTestCase;
-use ControlBit\Dto\Tests\Resources\DtoWithConstructor;
+use ControlBit\Dto\Tests\Resources\ConstructorStrategy\DtoWithConstructor;
+use ControlBit\Dto\Tests\Resources\ConstructorStrategy\DtoWithConstructorAlwaysStrategy;
+use ControlBit\Dto\Tests\Resources\ConstructorStrategy\DtoWithConstructorNeverStrategy;
+use ControlBit\Dto\Tests\Resources\ConstructorStrategy\DtoWithConstructorOptionalStrategy;
 use ControlBit\Dto\Tests\Resources\DtoWithoutConstructor;
 
 class ConstructorTest extends LibraryTestCase
@@ -20,7 +22,7 @@ class ConstructorTest extends LibraryTestCase
             public string $foo = 'foo';
         };
 
-        $mappedObject = $this->getMapper()->map($from, DtoWithConstructor::class);
+        $mappedObject = $this->getMapper()->map($from, DtoWithConstructorOptionalStrategy::class);
 
         $this->assertEquals('foofoo', $mappedObject->foo);
     }
@@ -36,23 +38,13 @@ class ConstructorTest extends LibraryTestCase
         $this->assertEquals('foo', $mappedObject->foo);
     }
 
-    public function testOptionalConstructorWhenMissingArgument(): void
-    {
-        $from = new class() {
-        };
-
-        $mappedObject = $this->getMapper()->map($from, DtoWithConstructor::class);
-
-        $this->assertIsObject($mappedObject);
-    }
-
     public function testNeverConstructorStrategy(): void
     {
         $from = new class() {
             public string $foo = 'foo';
         };
 
-        $mappedObject = Factory::create(true, ConstructorStrategy::NEVER)->map($from, DtoWithConstructor::class);
+        $mappedObject = $this->getMapper()->map($from, DtoWithConstructorNeverStrategy::class);
 
         $this->assertEquals('foo', $mappedObject->foo);
     }
@@ -63,7 +55,7 @@ class ConstructorTest extends LibraryTestCase
             public string $foo = 'foo';
         };
 
-        $mappedObject = $this->getMapper()->map($from, DtoWithConstructor::class);
+        $mappedObject = $this->getMapper()->map($from, DtoWithConstructorAlwaysStrategy::class);
 
         $this->assertEquals('foofoo', $mappedObject->foo);
     }
@@ -75,16 +67,5 @@ class ConstructorTest extends LibraryTestCase
         $this->expectException(MissingArgumentException::class);
 
         Factory::create(true, ConstructorStrategy::ALWAYS)->map($from, DtoWithConstructor::class);
-    }
-
-    public function testAttributeOverridesDefaultStrategy(): void
-    {
-        $from = new #[Dto(constructorStrategy: ConstructorStrategy::NEVER)]class() {
-            public string $foo = 'foo';
-        };
-
-        $mappedObject = $this->getMapper()->map($from, DtoWithConstructor::class);
-
-        $this->assertEquals('foo', $mappedObject->foo);
     }
 }

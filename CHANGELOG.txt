@@ -1,10 +1,14 @@
 # Changelog
 
+## [1.1.1]
+- Added possibility to specify index when mapping to nested object, if some part of the path is array.
+- Fixed issue when processor wrongly passing stdClass instead of array.
+
 ## [1.1.0]
-- Adding UUID transformer
+- Adding UUID transformer.
 - No need to add #[Dto] on property, when mapping to destination, if destination property class have #[Dto].
-- Added support for Nested mapping
-- Added support for transformer, when have array to transform, to transform each element (optional)
+- Added support for Nested mapping.
+- Added support for transformer, when have array to transform, to transform each element (optional).
 - Added Dto Processor, a new feature to process Dto before or after mapping.
 
 ## [1.0.0]
