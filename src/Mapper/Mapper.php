@@ -17,6 +17,7 @@ use ControlBit\Dto\MetaData\Map\MapMetadataCollection;
 use ControlBit\Dto\MetaData\Map\MapMetadataFactory;
 use ControlBit\Dto\Processor\Processor;
 use ControlBit\Dto\Util\Initializer;
+use function Symfony\Component\String\s;
 
 final readonly class Mapper implements MapperInterface
 {
@@ -39,6 +40,15 @@ final readonly class Mapper implements MapperInterface
         return \array_map(fn($item) => $this->map($item, $destination), $source);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public function mapCollectionIterable(array $source, string $destination = null): iterable
+    {
+        foreach ($source as $item) {
+            yield $this->map($item, $destination);
+        }
+    }
 
     /**
      * {@inheritDoc}

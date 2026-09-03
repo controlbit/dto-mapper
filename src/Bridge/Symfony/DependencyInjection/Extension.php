@@ -43,6 +43,7 @@ class Extension extends SymfonyExtension
         $container->setParameter('dto_bundle.constructor_strategy', $constructorStrategy);
 
         $container->setAlias('dto_bundle.case_transformer', $config['case_transformer']);
+        $container->setAlias('dto_bundle.cache', $config['cache']);
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/Config'));
 
         $loader->load('case_transformer.xml');

@@ -24,13 +24,14 @@
                 class="ControlBit\Dto\MetaData\Method\MethodMetadataFactory"
         />
 
-        <!--        Object Metadata Factory-->
+        <!--        Object/Class Metadata Factory-->
         <service
                 id="ControlBit\Dto\MetaData\Class\ClassMetadataFactory"
                 class="ControlBit\Dto\MetaData\Class\ClassMetadataFactory"
         >
             <argument type="service" id="ControlBit\Dto\MetaData\Property\PropertyMetadataFactory"/>
             <argument type="service" id="ControlBit\Dto\MetaData\Method\MethodMetadataFactory"/>
+            <argument key="$cache" type="service" on-invalid="null" id="dto_bundle.cache"/>
         </service>
 
         <!--        Destination Factory -->
@@ -66,7 +67,9 @@
         <service
                 id="ControlBit\Dto\MetaData\Map\MapMetadataFactory"
                 class="ControlBit\Dto\MetaData\Map\MapMetadataFactory"
-        />
+        >
+            <argument key="$cache" type="service" on-invalid="null" id="dto_bundle.cache"/>
+        </service>
 
     </services>
 </container>

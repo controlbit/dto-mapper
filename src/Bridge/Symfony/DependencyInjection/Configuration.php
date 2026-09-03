@@ -34,6 +34,10 @@ final class Configuration implements ConfigurationInterface
                         ->defaultValue(ConstructorStrategy::OPTIONAL->value)
                         ->info('Default constructor strategy. Can be overridden via Attribute.')
                     ->end()
+                    ->scalarNode('cache')
+                        ->defaultValue('cache.app')
+                        ->info('ID of cache pool to use.')
+                    ->end()
             ->end()
         ;
 
