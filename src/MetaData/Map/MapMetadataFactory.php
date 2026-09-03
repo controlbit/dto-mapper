@@ -28,8 +28,8 @@ final class MapMetadataFactory
     public function create(ClassMetadata $sourceMetadata, ClassMetadata $destinationMetadata): MapMetadataCollection
     {
         if ($this->cache) {
-            $sourceKey             = get_cache_key('source', $sourceMetadata);
-            $destinationKey        = get_cache_key('destination', $destinationMetadata);
+            $sourceKey             = get_cache_key('source', $sourceMetadata->getFqcn());
+            $destinationKey        = get_cache_key('destination', $destinationMetadata->getFqcn());
             $validCompoundCacheKey = false !== $sourceKey && false !== $destinationKey;
             $cacheItem             = $validCompoundCacheKey
                 ? get_cache_item($this->cache, '_cb_dtm_mmtd', $sourceKey.'_'.$destinationKey)
