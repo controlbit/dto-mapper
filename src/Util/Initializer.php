@@ -26,14 +26,19 @@ final class Initializer
      */
     public static function autoInitialize(object $object, ClassMetadata $objectMetadata): void
     {
+        $reflection = new \ReflectionObject($object);
+
         foreach ($objectMetadata->getProperties() as $propertyMetadata) {
-            self::autoInitializeProperty($object, $propertyMetadata);
+            self::autoInitializeProperty($reflection, $object, $propertyMetadata);
         }
     }
 
-    private static function autoInitializeProperty(object $object, PropertyMetadata $propertyMetadata): void
-    {
-        if ((new \ReflectionObject($object))->getProperty($propertyMetadata->getName())->isInitialized($object)) {
+    private static function autoInitializeProperty(
+        \ReflectionObject $reflection,
+        object             $object,
+        PropertyMetadata   $propertyMetadata,
+    ): void {
+        if ($reflection->getProperty($propertyMetadata->getName())->isInitialized($object)) {
             return;
         }
 

@@ -122,6 +122,8 @@ final readonly class Mapper implements MapperInterface
         ClassMetadata         $destinationMetadata,
         MapMetadataCollection $mapMetadataCollection,
     ): object {
+        $sourceReflection = new \ReflectionObject($source);
+
         foreach ($mapMetadataCollection as $mapMetadata) {
             if ($mapMetadata->isMappedInConstructor() || $mapMetadata->isIgnored()) {
                 continue;
@@ -133,8 +135,7 @@ final readonly class Mapper implements MapperInterface
                 continue;
             }
 
-            $sourceReflection = new \ReflectionObject($source);
-            $getter           = $this->accessorFinder->findGetter($sourceReflection, $mapMetadata);
+            $getter = $this->accessorFinder->findGetter($sourceReflection, $mapMetadata);
 
             if (null === $getter) {
                 continue;

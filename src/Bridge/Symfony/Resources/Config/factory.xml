@@ -40,7 +40,6 @@
                 class="ControlBit\Dto\Destination\DestinationFactory"
         >
             <argument type="tagged_iterator" tag="dto_bundle.destination_factory_delegate"/>
-            <argument key="$cache" type="service" on-invalid="null" id="dto_bundle.cache"/>
         </service>
 
         <service

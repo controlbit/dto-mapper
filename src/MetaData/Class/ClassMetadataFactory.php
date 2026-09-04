@@ -42,7 +42,7 @@ final readonly class ClassMetadataFactory
 
         $properties = new PropertyBag();
         foreach ($reflection->getProperties() as $reflectionProperty) {
-            $properties->add($this->propertyMetadataFactory->create($subject, $reflectionProperty->getName()));
+            $properties->add($this->propertyMetadataFactory->create($reflection, $reflectionProperty->getName()));
         }
 
         $methods = new MethodBag();
