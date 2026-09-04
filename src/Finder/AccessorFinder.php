@@ -15,6 +15,7 @@ use ControlBit\Dto\Bag\TypeBag;
 use ControlBit\Dto\Contract\Accessor\AccessorInterface;
 use ControlBit\Dto\Contract\Accessor\GetterInterface;
 use ControlBit\Dto\Contract\Accessor\SetterInterface;
+use ControlBit\Dto\MetaData\Class\ClassMetadata;
 use ControlBit\Dto\MetaData\Map\MapMetadata;
 use ControlBit\Dto\Util\TypeTool;
 use function ControlBit\Dto\instantiate_attributes;
@@ -84,14 +85,27 @@ readonly final class AccessorFinder
     }
 
     /**
+     * @template S of object
      * @param  \ReflectionClass<object>|\ReflectionObject<object>  $reflectionClass
+     * @param  ClassMetadata<S>|null  $sourceMetadata
      */
     public function findGetter(
-        \ReflectionObject|\ReflectionClass $reflectionClass,
+        \ReflectionObject|\ReflectionClass                $reflectionClass,
         \ReflectionProperty|\ReflectionMethod|MapMetadata $member,
+        ?ClassMetadata                                     $sourceMetadata = null,
     ): ?GetterInterface {
 
         if ($member instanceof MapMetadata) {
+            $sourceMember = $member->getSourceMember();
+
+            if (null !== $sourceMetadata && null !== $sourceMember && !$this->isNestedMember($member)) {
+                $cachedGetter = $sourceMetadata->getProperty($sourceMember)?->getAccessor()->getGetter();
+
+                if (null !== $cachedGetter) {
+                    return $cachedGetter;
+                }
+            }
+
             switch (true) {
                 case $member->getSourceMember() && $reflectionClass->hasProperty($member->getSourceMember()):
                     $member = $reflectionClass->getProperty($member->getSourceMember());

@@ -135,7 +135,7 @@ final readonly class Mapper implements MapperInterface
                 continue;
             }
 
-            $getter = $this->accessorFinder->findGetter($sourceReflection, $mapMetadata);
+            $getter = $this->accessorFinder->findGetter($sourceReflection, $mapMetadata, $sourceMetadata);
 
             if (null === $getter) {
                 continue;
