@@ -92,7 +92,8 @@ function get_cache_item(CacheItemPoolInterface $cache, string $prefix, object|st
 function get_cache_key(string $prefix, object|string $subject): false|string
 {
     if (\is_object($subject) && stdClass::class === \get_class($subject)) {
-        return false;
+        $propNames = \array_keys(\get_object_vars($subject));
+        return $prefix . '_' . \md5(\implode(',', $propNames));
     }
 
     if ($subject === stdClass::class) {
