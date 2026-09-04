@@ -72,7 +72,7 @@ final readonly class Mapper implements MapperInterface
         }
 
         $destinationMetadata = $this->objectMetadataFactory->create($destination);
-        $mapMetadata         = $this->mapMetadataFactory->create($sourceMetadata, $destinationMetadata);
+        $mapMetadata         = $this->mapMetadataFactory->create($source, $sourceMetadata, $destinationMetadata);
 
         // Auto-initialize values that are not initialized in a source object.
         Initializer::autoInitialize($source, $sourceMetadata);
