@@ -13,20 +13,25 @@ final class MapMetadataCollection implements \IteratorAggregate, \Countable
      */
     private array $collection = [];
 
+    /**
+     * @var array<string, MapMetadata>
+     */
+    private array $byDestinationMember = [];
+
     public function add(MapMetadata $mapMetadata): void
     {
         $this->collection[] = $mapMetadata;
+
+        $destinationMember = $mapMetadata->getDestinationMember();
+
+        if (null !== $destinationMember) {
+            $this->byDestinationMember[$destinationMember] = $mapMetadata;
+        }
     }
 
     public function getHavingDestinationMember(string $member): ?MapMetadata
     {
-        foreach ($this->collection as $mapMetadata) {
-            if ($mapMetadata->getDestinationMember() === $member) {
-                return $mapMetadata;
-            }
-        }
-
-        return null;
+        return $this->byDestinationMember[$member] ?? null;
     }
 
     public function getIterator(): \Traversable

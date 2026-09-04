@@ -51,6 +51,17 @@ final class NeverStrategy implements ConstructorStrategyInterface
         return $destinationReflectionClass->newInstanceWithoutConstructor();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public function supports(
+        ClassMetadata         $sourceMetadata,
+        MapMetadataCollection $mapMetadata,
+        \ReflectionClass      $destinationReflectionClass,
+    ): bool {
+        return true;
+    }
+
     public function getName(): string
     {
         return self::NAME;

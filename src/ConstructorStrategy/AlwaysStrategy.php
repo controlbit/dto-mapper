@@ -95,10 +95,6 @@ final readonly class AlwaysStrategy implements ConstructorStrategyInterface
             /** @var GetterInterface $getter */
             $getter = $sourcePropertyMetadata->getAccessor()->getGetter();
 
-//            if (null === $getter) {
-//                continue;
-//            }
-
             $setter = new ConstructorSetter(
                 new TypeBag(TypeTool::getReflectionTypes($argument)),
                 AttributeBag::fromArray(instantiate_attributes($argument)),
@@ -116,6 +112,47 @@ final readonly class AlwaysStrategy implements ConstructorStrategyInterface
         }
 
         return $destinationReflectionClass->newInstanceArgs($argumentsToPass);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function supports(
+        ClassMetadata         $sourceMetadata,
+        MapMetadataCollection $mapMetadata,
+        \ReflectionClass      $destinationReflectionClass,
+    ): bool {
+        $constructor = $destinationReflectionClass->getConstructor();
+
+        if (null === $constructor) {
+            return false;
+        }
+
+        foreach ($constructor->getParameters() as $argument) {
+            if (!$this->isArgumentSatisfiable($argument, $sourceMetadata, $mapMetadata)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @phpstan-param ClassMetadata<object> $sourceMetadata
+     */
+    private function isArgumentSatisfiable(
+        \ReflectionParameter  $argument,
+        ClassMetadata         $sourceMetadata,
+        MapMetadataCollection $mapMetadata,
+    ): bool {
+        $destinationMemberMetaData = $mapMetadata->getHavingDestinationMember($argument->getName());
+        $sourceMember = $destinationMemberMetaData?->getSourceMember();
+
+        if (null !== $sourceMember && null !== $sourceMetadata->getProperty($sourceMember)) {
+            return true;
+        }
+
+        return $argument->allowsNull() || $argument->isDefaultValueAvailable();
     }
 
     private function getArgumentValue(\ReflectionParameter $argument, mixed $value = null): mixed
