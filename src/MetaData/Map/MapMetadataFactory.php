@@ -81,8 +81,9 @@ final class MapMetadataFactory
             });
         }
 
-        if ($this->cache) {
+        if ($this->cache && isset($cacheItem)) {
             $cacheItem?->set($mapMetadata);
+            $this->cache->save($cacheItem);
         }
 
         return $mapMetadata;

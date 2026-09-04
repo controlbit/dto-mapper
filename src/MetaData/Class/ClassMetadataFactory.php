@@ -60,8 +60,9 @@ final readonly class ClassMetadataFactory
             $methods
         );
 
-        if ($this->cache) {
+        if ($this->cache && isset($cacheItem)) {
             $cacheItem?->set($classMetadata);
+            $this->cache->save($cacheItem);
         }
 
         return $classMetadata;
