@@ -3,6 +3,10 @@ declare(strict_types=1);
 
 namespace ControlBit\Dto;
 
+use Psr\Cache\CacheItemPoolInterface;
+use stdClass;
+use Symfony\Component\Cache\CacheItem;
+
 /**
  * @template T of object
  * @param  object|\ReflectionProperty|class-string  $subject
@@ -72,4 +76,30 @@ function instantiate_attributes(
     return \array_map(static function (\ReflectionAttribute $reflectionAttribute) {
         return $reflectionAttribute->newInstance();
     }, $reflection->getAttributes());
+}
+
+function get_cache_item(CacheItemPoolInterface $cache, string $prefix, object|string $subject): ?CacheItem
+{
+    $cacheKey = get_cache_key($prefix, $subject);
+
+    if (false === $cacheKey) {
+        return null;
+    }
+
+    return $cache->getItem($cacheKey);
+}
+
+function get_cache_key(string $prefix, object|string $subject): false|string
+{
+    if (\is_object($subject) && stdClass::class === \get_class($subject)) {
+        $propNames = \array_keys(\get_object_vars($subject));
+        return $prefix . '_' . \md5(\implode(',', $propNames));
+    }
+
+    if ($subject === stdClass::class) {
+        return false;
+    }
+
+
+    return $prefix . '_' . \md5(\is_object($subject)? \get_class($subject) : $subject);
 }

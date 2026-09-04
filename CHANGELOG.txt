@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.2.0]
+- Fixing bug with container injection on Processor.
+- Added caching for class and map metadata.
+- Added Map Collection Iterable.
+
 ## [1.1.1]
 - Added possibility to specify index when mapping to nested object, if some part of the path is array.
 - Fixed issue when processor wrongly passing stdClass instead of array.

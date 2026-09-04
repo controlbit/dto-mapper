@@ -20,9 +20,8 @@ final readonly class PropertyMetadataFactory
      *
      * @param  T|class-string<T>  $subject
      */
-    public function create(object|string $subject, string $propertyName): PropertyMetadata
+    public function create(\ReflectionObject|\ReflectionClass $reflectionObject, string $propertyName): PropertyMetadata
     {
-        $reflectionObject   = \is_object($subject) ? new \ReflectionObject($subject) : new \ReflectionClass($subject);
         $reflectionProperty = $reflectionObject->getProperty($propertyName);
         $type               = $this->getType($reflectionProperty);
 

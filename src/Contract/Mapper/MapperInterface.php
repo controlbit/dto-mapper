@@ -26,4 +26,13 @@ interface MapperInterface
      * @return array<T>
      */
     public function mapCollection(array $source, ?string $destination = null): array;
+
+    /**
+     * @template T of object
+     * @param  array<object|array<string,mixed>>  $source
+     * @param  class-string<T>|null               $destination
+     *
+     * @return iterable<T>
+     */
+    public function mapCollectionIterable(array $source, ?string $destination = null): iterable;
 }

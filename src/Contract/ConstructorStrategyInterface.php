@@ -34,5 +34,21 @@ interface ConstructorStrategyInterface
         \ReflectionClass      $destinationReflectionClass,
     ): object;
 
+    /**
+     * Cheap, side-effect-free check for whether this strategy can actually produce
+     * a destination instance for the given source/destination pair. Must not throw
+     * and must not do any of the work `create()` would do (no value conversion).
+     *
+     * @template S of object
+     * @template D of object
+     * @param  ClassMetadata<S>      $sourceMetadata
+     * @param  \ReflectionClass<D>  $destinationReflectionClass
+     */
+    public function supports(
+        ClassMetadata         $sourceMetadata,
+        MapMetadataCollection $mapMetadata,
+        \ReflectionClass      $destinationReflectionClass,
+    ): bool;
+
     public function getName(): string;
 }

@@ -17,6 +17,7 @@ use ControlBit\Dto\MetaData\Map\MapMetadataCollection;
 use ControlBit\Dto\MetaData\Map\MapMetadataFactory;
 use ControlBit\Dto\Processor\Processor;
 use ControlBit\Dto\Util\Initializer;
+use function Symfony\Component\String\s;
 
 final readonly class Mapper implements MapperInterface
 {
@@ -39,6 +40,15 @@ final readonly class Mapper implements MapperInterface
         return \array_map(fn($item) => $this->map($item, $destination), $source);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public function mapCollectionIterable(array $source, string $destination = null): iterable
+    {
+        foreach ($source as $item) {
+            yield $this->map($item, $destination);
+        }
+    }
 
     /**
      * {@inheritDoc}
@@ -62,7 +72,7 @@ final readonly class Mapper implements MapperInterface
         }
 
         $destinationMetadata = $this->objectMetadataFactory->create($destination);
-        $mapMetadata         = $this->mapMetadataFactory->create($sourceMetadata, $destinationMetadata);
+        $mapMetadata         = $this->mapMetadataFactory->create($source, $sourceMetadata, $destinationMetadata);
 
         // Auto-initialize values that are not initialized in a source object.
         Initializer::autoInitialize($source, $sourceMetadata);
@@ -112,6 +122,8 @@ final readonly class Mapper implements MapperInterface
         ClassMetadata         $destinationMetadata,
         MapMetadataCollection $mapMetadataCollection,
     ): object {
+        $sourceReflection = new \ReflectionObject($source);
+
         foreach ($mapMetadataCollection as $mapMetadata) {
             if ($mapMetadata->isMappedInConstructor() || $mapMetadata->isIgnored()) {
                 continue;
@@ -123,8 +135,7 @@ final readonly class Mapper implements MapperInterface
                 continue;
             }
 
-            $sourceReflection = new \ReflectionObject($source);
-            $getter           = $this->accessorFinder->findGetter($sourceReflection, $mapMetadata);
+            $getter = $this->accessorFinder->findGetter($sourceReflection, $mapMetadata);
 
             if (null === $getter) {
                 continue;

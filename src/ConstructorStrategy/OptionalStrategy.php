@@ -4,8 +4,6 @@ declare(strict_types=1);
 namespace ControlBit\Dto\ConstructorStrategy;
 
 use ControlBit\Dto\Contract\ConstructorStrategyInterface;
-use ControlBit\Dto\Exception\MissingArgumentException;
-use ControlBit\Dto\Exception\MissingConstructorException;
 use ControlBit\Dto\Mapper\Mapper;
 use ControlBit\Dto\MetaData\Class\ClassMetadata;
 use ControlBit\Dto\MetaData\Map\MapMetadataCollection;
@@ -52,10 +50,21 @@ final class OptionalStrategy implements ConstructorStrategyInterface
         MapMetadataCollection $mapMetadata,
         \ReflectionClass      $destinationReflectionClass,
     ): object {
-        try {
+        if ($this->alwaysStrategy->supports($sourceMetadata, $mapMetadata, $destinationReflectionClass)) {
             return $this->alwaysStrategy->create(...func_get_args()); // @phpstan-ignore-line
-        } catch (MissingConstructorException|MissingArgumentException) {
-            return $this->neverStrategy->create(...func_get_args()); // @phpstan-ignore-line
         }
+
+        return $this->neverStrategy->create(...func_get_args()); // @phpstan-ignore-line
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function supports(
+        ClassMetadata         $sourceMetadata,
+        MapMetadataCollection $mapMetadata,
+        \ReflectionClass      $destinationReflectionClass,
+    ): bool {
+        return true;
     }
 }
